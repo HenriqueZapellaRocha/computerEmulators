@@ -244,7 +244,7 @@ execute processor memory =
     in case opcode of
         2 -> (lod updatedProcessor memory, memory)  -- LOD
         14 -> (add updatedProcessor memory, memory)  -- ADD
-        16 -> (sub updatedProcessor memory, memory)  -- ADD
+        16 -> (sub updatedProcessor memory, memory)  -- SUB
         4 -> (updatedProcessor, sto updatedProcessor memory) -- STO
         10 -> (cpe updatedProcessor memory, memory)  -- CPE 
         6 -> (jmp updatedProcessor memory, memory) -- JMP
