@@ -52,3 +52,6 @@ simple8bitProcessorInHaskell/.vscode/tasks.json
 *6502main.dSYM
 *.out
 mos6502Emulator/6502main
+mos6502Emulator/build/Debug/outDebug
+.vscode/launch.json
+.vscode/settings.json
