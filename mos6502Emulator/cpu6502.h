@@ -1,4 +1,3 @@
-
 #define CPU6502_H
 #include <stdint.h>
 

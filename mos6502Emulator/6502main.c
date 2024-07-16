@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main(void) {
-   CPU cpu;
+    CPU cpu;
     Memory memory;
     
     startCPUMEMORY(&cpu, &memory);
@@ -27,11 +27,11 @@ int main(void) {
 
     //LDA Zero Page,X
     memory.Data[0xFFFC] = InsLDAZPX; //opdocde
-    memory.Data[0xFFFD] = 0x42; // adress
-    memory.Data[0x42] = 20; //value
-    cpu.X = 10;
+    memory.Data[0xFFFD] = 0x44; // adress
+    memory.Data[0x46] = 20; //value
+    cpu.X = 0x2;
     cpu.executeI(&cpu, &memory, 3);
-    printf("LDA Zero Page,X TEST, EXPECTED 30, RESULT: %d", cpu.ACC);
+    printf("LDA Zero Page,X TEST, EXPECTED 20, RESULT: %d", cpu.ACC);
     printf("\n\n");
     cpu.reset(&cpu,&memory);
 

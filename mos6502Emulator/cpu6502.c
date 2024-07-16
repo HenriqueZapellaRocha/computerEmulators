@@ -82,9 +82,8 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         }
         case InsLDAZPX: {
             Byte adress = fetchInstrucstion(cpu,memory,&cycles);
+            adress += cpu->X;
             temp = readByteInMemory(memory, &cycles, adress);
-            temp += cpu->X;
-            cycles--;
             cpu->ACC = temp;
             updateFlagsLDA(cpu);
             break;
@@ -101,6 +100,8 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         default:
             break;
         }
+        if(cycles != 0)
+            cycles--;
     }
 }
 
