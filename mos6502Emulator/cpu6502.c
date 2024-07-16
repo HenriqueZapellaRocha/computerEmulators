@@ -6,6 +6,9 @@ const Byte InsLDAZP = 0xA5; // LDA zero page
 const Byte InsLDAZPX = 0xB5; // LDA zero page X
 const Byte InsJSRABS = 0x20; // JSR absolute
 const Byte InsLDAABS = 0xAD; //LAD Absolute
+const Byte InsLDAABSX = 0xBD;//LAD Absolute,X
+const Byte InsLDAABSY = 0xB9;//LAD Absolute,Y
+
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -102,6 +105,26 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             Word adress = fetchWord(cpu,memory,&cycles);
             Byte data = readByteInMemory(memory,&cycles,adress);
             cpu->ACC = data;
+            break;
+        }
+        case InsLDAABSX: {
+            Word adress = fetchWord(cpu,memory,&cycles);
+            Word adressX = adress + cpu->X;
+            Byte data = readByteInMemory(memory,&cycles,adressX);
+            cpu->ACC = data;
+            if ((adress & 0xFF00) != (adressX & 0xFF00)) {
+                cycles--;
+                }
+            break;
+        }
+        case InsLDAABSY: {
+            Word adress = fetchWord(cpu,memory,&cycles);
+            Word adressY = adress + cpu->Y;
+            Byte data = readByteInMemory(memory,&cycles,adressY);
+            cpu->ACC = data;
+            if ((adress & 0xFF00) != (adressY & 0xFF00)) {
+                cycles--;
+                }
             break;
         }
         case InsJSRABS: {

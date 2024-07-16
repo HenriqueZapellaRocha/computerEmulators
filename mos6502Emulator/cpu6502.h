@@ -11,7 +11,8 @@ extern const Byte InsLDAZP; // LAD zero page
 extern const Byte InsLDAZPX; //Zero page x
 extern const Byte InsJSRABS; //JSR absolute
 extern const Byte InsLDAABS; //LAD Absolute
-
+extern const Byte InsLDAABSX;//LAD Absolute,X
+extern const Byte InsLDAABSY;//LAD absolute,Y
 
 
 typedef struct Memory {
