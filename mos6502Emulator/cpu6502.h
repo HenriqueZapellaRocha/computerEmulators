@@ -10,6 +10,7 @@ extern const Byte InsLDAIM; //LAD load imediatly
 extern const Byte InsLDAZP; // LAD zero page
 extern const Byte InsLDAZPX; //Zero page x
 extern const Byte InsJSRABS; //JSR absolute
+extern const Byte InsLDAABS; //LAD Absolute
 
 
 
@@ -38,17 +39,18 @@ typedef struct CPU {
     void (*reset)(struct CPU *cpu, struct Memory *memory);
     void (*executeI)(struct CPU *cpu, struct Memory *memory, u32 cycles);
     Byte (*fetchInstrucstion)(struct CPU *cpu, struct Memory *memory, u32 *cycles);
-    Byte (*readByteInMemory)(struct Memory *Memory, u32 *cycles, u32 adress);
+    Byte (*readByteInMemoryZeroPage)(struct Memory *Memory, u32 *cycles, Byte adress);
     Word (*fetchWord)(struct CPU *cpu, struct Memory *memory, u32 *cycles);
+    Byte (*readByteInMemory)(struct Memory *memory, u32 *cycles, Word adrress);
 } CPU;
 
 void reset(CPU *cpu, Memory *memory);
 void initMemory(Memory *memory);
 void writeWord(Word data, u32 address, Memory *memory, u32 *cycles);
-Byte readByteInMemory(Memory *memory, u32 *cycles, u32 adrress);
 Word fetchWord(CPU *cpu, Memory *memory, u32 *cycles);
 Byte fetchInstrucstion(CPU *cpu, Memory *memory, u32 *cycles);
 void updateFlagsLDA(CPU *cpu);
 void executeI(CPU *cpu, Memory *memory, u32 cycles);
 void startCPUMEMORY(CPU *cpu, Memory *memory);
-
+Byte readByteInMemoryZeroPage(Memory *memory, u32 *cycles, Byte adrress);
+Byte readByteInMemory(Memory *memory, u32 *cycles, Word adrress);

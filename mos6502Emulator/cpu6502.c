@@ -5,7 +5,10 @@ const Byte InsLDAIM = 0xA9; // LDA load immediately
 const Byte InsLDAZP = 0xA5; // LDA zero page
 const Byte InsLDAZPX = 0xB5; // LDA zero page X
 const Byte InsJSRABS = 0x20; // JSR absolute
+const Byte InsLDAABS = 0xAD; //LAD Absolute
+
 const u32 maxMemorySize = 1024 * 64;
+
 
 void reset(CPU *cpu, Memory *memory) {
     cpu->PC = 0x0FFFC;
@@ -27,11 +30,18 @@ void writeWord(Word data, u32 address, Memory *memory, u32 *cycles) {
         (*cycles)--;
 }
 
-Byte readByteInMemory(Memory *memory, u32 *cycles, u32 adrress) {
+Byte readByteInMemoryZeroPage(Memory *memory, u32 *cycles, Byte adrress) {
     Byte Data = memory->Data[adrress];
     (*cycles)--;
     return Data;
 }
+
+Byte readByteInMemory(Memory *memory, u32 *cycles, Word adrress) {
+    Byte Data = memory->Data[adrress];
+    (*cycles)--;
+    return Data;
+}
+
 
 Word fetchWord(CPU *cpu, Memory *memory, u32 *cycles) {
     //take word
@@ -75,7 +85,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         }
         case InsLDAZP: {
             Byte adress = fetchInstrucstion(cpu,memory,&cycles);
-            temp = readByteInMemory(memory, &cycles, adress);
+            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
             cpu->ACC = temp;
             updateFlagsLDA(cpu);
             break;
@@ -83,9 +93,15 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         case InsLDAZPX: {
             Byte adress = fetchInstrucstion(cpu,memory,&cycles);
             adress += cpu->X;
-            temp = readByteInMemory(memory, &cycles, adress);
+            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
             cpu->ACC = temp;
             updateFlagsLDA(cpu);
+            break;
+        }
+        case InsLDAABS: {
+            Word adress = fetchWord(cpu,memory,&cycles);
+            Byte data = readByteInMemory(memory,&cycles,adress);
+            cpu->ACC = data;
             break;
         }
         case InsJSRABS: {
@@ -94,7 +110,6 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             memory->Data[cpu->SP] = (unsigned char)(cpu->PC - 1);
             cycles--;
             cpu->PC = subAddr;
-            cycles--;
             break;
         }
         default:
@@ -109,6 +124,7 @@ void startCPUMEMORY(CPU *cpu, Memory *memory) {
     (*cpu).reset = reset;
     (*cpu).executeI = executeI;
     (*cpu).fetchInstrucstion = fetchInstrucstion;
+    (*cpu).readByteInMemoryZeroPage = readByteInMemoryZeroPage;
     (*cpu).readByteInMemory = readByteInMemory;
     (*cpu).fetchWord = fetchWord;
     (*memory).initMemory = initMemory;
