@@ -8,7 +8,8 @@ const Byte InsJSRABS = 0x20; // JSR absolute
 const Byte InsLDAABS = 0xAD; //LAD Absolute
 const Byte InsLDAABSX = 0xBD;//LAD Absolute,X
 const Byte InsLDAABSY = 0xB9;//LAD Absolute,Y
-
+const Byte InsLDAINDX = 0xA1;//LAD Indirect,X
+const Byte InsLDAINDY = 0xB1;//LAD Indirect,Y
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -43,6 +44,13 @@ Byte readByteInMemory(Memory *memory, u32 *cycles, Word adrress) {
     Byte Data = memory->Data[adrress];
     (*cycles)--;
     return Data;
+}
+
+Word readWord(Memory *memory, u32 *cycles, Word adrress) {
+    Byte lowByte =  readByteInMemory(memory,cycles,adrress);
+    Byte highByte = readByteInMemory(memory,cycles,adrress+1);
+    Word value = ((Word)(highByte << 8)) | lowByte;
+    return value;
 }
 
 
@@ -105,6 +113,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             Word adress = fetchWord(cpu,memory,&cycles);
             Byte data = readByteInMemory(memory,&cycles,adress);
             cpu->ACC = data;
+            updateFlagsLDA(cpu);
             break;
         }
         case InsLDAABSX: {
@@ -114,7 +123,8 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             cpu->ACC = data;
             if ((adress & 0xFF00) != (adressX & 0xFF00)) {
                 cycles--;
-                }
+            }
+            updateFlagsLDA(cpu);
             break;
         }
         case InsLDAABSY: {
@@ -124,7 +134,29 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             cpu->ACC = data;
             if ((adress & 0xFF00) != (adressY & 0xFF00)) {
                 cycles--;
-                }
+            }
+            updateFlagsLDA(cpu);
+            break;
+        }
+        case InsLDAINDX: {
+            Byte tempAdress = fetchInstrucstion(cpu,memory,&cycles);
+            Word zeroPageBaseAdress = tempAdress + cpu->X;
+            Word efectiveAdress = readWord(memory,&cycles,zeroPageBaseAdress);
+            Byte value = readByteInMemory(memory,&cycles,efectiveAdress);
+            cpu->ACC = value;
+            updateFlagsLDA(cpu);
+            break;
+        }
+        case InsLDAINDY: {
+            Byte ZeroPageAdress = fetchInstrucstion(cpu,memory,&cycles);
+            Word adress = readWord(memory,&cycles,ZeroPageAdress);
+            Word efectiveadress = adress + cpu->Y;
+            Byte value = readByteInMemory(memory,&cycles,efectiveadress);
+            cpu->ACC = value;
+            updateFlagsLDA(cpu);
+            if ((adress & 0xFF00) != (efectiveadress& 0xFF00)) {
+                cycles--;
+            }
             break;
         }
         case InsJSRABS: {

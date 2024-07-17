@@ -41,7 +41,7 @@ int main(void) {
     memory.Data[0x4242] = 10; //value
     cpu.executeI(&cpu, &memory, 4);
     printf("LDA Absolute TEST, EXEXPECTED 10, RESULT: %d", cpu.ACC);
-    printf("\n\n");;
+    printf("\n\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute,X
@@ -52,7 +52,7 @@ int main(void) {
     memory.Data[0x4081] = 10; //value
     cpu.executeI(&cpu, &memory, 4);
     printf("LDA Absolute X TEST, EXEXPECTED 10, RESULT: %d", cpu.ACC);
-    printf("\n\n");;
+    printf("\n\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute,X (page boundry)
@@ -63,7 +63,7 @@ int main(void) {
     memory.Data[0x4501/*cross page boundry*/] = 0x37; 
     cpu.executeI(&cpu, &memory, 5);
     printf("LDA Absolute X (with page boundry) TEST, EXEXPECTED 0x37, RESULT: 0x%x", cpu.ACC);
-    printf("\n\n");;
+    printf("\n\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute,y
@@ -74,7 +74,7 @@ int main(void) {
     memory.Data[0x4081] = 10; //value
     cpu.executeI(&cpu, &memory, 4);
     printf("LDA Absolute Y TEST, EXEXPECTED 10, RESULT: %d", cpu.ACC);
-    printf("\n\n");;
+    printf("\n\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute,y (page boundry)
@@ -85,9 +85,44 @@ int main(void) {
     memory.Data[0x4501/*cross page boundry*/] = 0x37; 
     cpu.executeI(&cpu, &memory, 5);
     printf("LDA Absolute Y (with page boundry) TEST, EXEXPECTED 0x37, RESULT: 0x%x", cpu.ACC);
-    printf("\n\n");;
+    printf("\n\n");
     cpu.reset(&cpu,&memory);
 
+    //LDA Inderect,X 
+    cpu.X = 0x04;
+    memory.Data[0xFFFC] = InsLDAINDX; //opdocde
+    memory.Data[0xFFFD] = 0x02; //adress
+    memory.Data[0x6] = 0x0; //adress
+    memory.Data[0x7] = 0x80; //adress
+    memory.Data[0x8000] = 10; //value
+    cpu.executeI(&cpu, &memory, 6);
+    printf("LDA Inderect,X TEST, EXEXPECTED 10, RESULT: %d", cpu.ACC);
+    printf("\n\n");
+    cpu.reset(&cpu,&memory);
+
+    //LDA Inderect,Y
+    cpu.Y = 0x4;
+    memory.Data[0xFFFC] = InsLDAINDY; //opdocde
+    memory.Data[0xFFFD] = 0x02; //adress
+    memory.Data[0x2] = 0x0; //adress
+    memory.Data[0x3] = 0x80; //adress
+    memory.Data[0x8004] = 10; //value cpu.y + 800
+    cpu.executeI(&cpu, &memory, 5);
+    printf("LDA Inderect,Y TEST, EXEXPECTED 10, RESULT: %d", cpu.ACC);
+    printf("\n\n");
+    cpu.reset(&cpu,&memory);
+
+    //LDA Inderect,Y (Page boundry)
+    cpu.Y = 0xFF;
+    memory.Data[0xFFFC] = InsLDAINDY; //opdocde
+    memory.Data[0xFFFD] = 0x02; //adress
+    memory.Data[0x2] = 0x02; //adress
+    memory.Data[0x3] = 0x80; //adress
+    memory.Data[0x8101] = 10; //value cpu.y + 800
+    cpu.executeI(&cpu, &memory, 6);
+    printf("LDA Inderect,Y (Page Boundry) TEST, EXEXPECTED 10, RESULT: %d", cpu.ACC);
+    printf("\n\n");;
+    cpu.reset(&cpu,&memory);
 
     //JSR 
     memory.Data[0xFFFC] = InsJSRABS; //opdocde

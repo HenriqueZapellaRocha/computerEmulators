@@ -13,7 +13,8 @@ extern const Byte InsJSRABS; //JSR absolute
 extern const Byte InsLDAABS; //LAD Absolute
 extern const Byte InsLDAABSX;//LAD Absolute,X
 extern const Byte InsLDAABSY;//LAD absolute,Y
-
+extern const Byte InsLDAINDX;//LAD Indirect,X
+extern const Byte InsLDAINDY;//LAD Indirect,Y
 
 typedef struct Memory {
     Byte Data[1024 * 64];
