@@ -20,7 +20,7 @@ const Byte InsLDXABSY = 0xBE;//LDX Absolute,Y
 //LDY
 const Byte InsLDYIM = 0xA0;//LDY Immediate
 const Byte InsLDYZP = 0xA4;//LDY Zero Page
-const Byte InsLDYZPY = 0xB4;//LDY Zero Page,Y
+const Byte InsLDYZPX = 0xB4;//LDY Zero Page,x
 const Byte InsLDYABS = 0xAC; //LDY Absolute
 const Byte InsLDYABSX = 0XBC; //LDY Absolute,X
 
@@ -216,6 +216,46 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             Word adressX = adress + cpu->Y;
             Byte data = readByteInMemory(memory,&cycles,adressX);
             cpu->X = data;
+            if ((adress & 0xFF00) != (adressX & 0xFF00)) {
+                cycles--;
+            }
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        //LOAD LDX CASES
+        case InsLDYIM: {
+            temp = fetchInstrucstion(cpu, memory,&cycles);
+            cpu->Y = temp;
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        case InsLDYZP: {
+            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
+            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
+            cpu->Y = temp;
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        case InsLDYZPX: {
+            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
+            adress += cpu->X;
+            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
+            cpu->Y = temp;
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        case InsLDYABS: {
+            Word adress = fetchWord(cpu,memory,&cycles);
+            Byte data = readByteInMemory(memory,&cycles,adress);
+            cpu->Y = data;
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        case InsLDYABSX: {
+            Word adress = fetchWord(cpu,memory,&cycles);
+            Word adressX = adress + cpu->X;
+            Byte data = readByteInMemory(memory,&cycles,adressX);
+            cpu->Y = data;
             if ((adress & 0xFF00) != (adressX & 0xFF00)) {
                 cycles--;
             }

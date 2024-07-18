@@ -22,7 +22,7 @@ extern const Byte InsLDXABS; //LDX Absolute
 extern const Byte InsLDXABSY;//LDX Absolute,Y
 extern const Byte InsLDYIM;//LDY Immediate
 extern const Byte InsLDYZP;//LDY Zero Page
-extern const Byte InsLDYZPY;//LDY Zero Page,Y
+extern const Byte InsLDYZPX;//LDY Zero Page,X
 extern const Byte InsLDYABS; //LDY Absolute
 extern const Byte InsLDYABSX; //LDY Absolute,X
 

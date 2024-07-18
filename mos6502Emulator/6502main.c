@@ -12,7 +12,7 @@ int main(void) {
     
     startCPUMEMORY(&cpu, &memory);
 
-    int testSelection = 2;
+    int testSelection = 3;
 
     switch (testSelection)
     {
@@ -273,12 +273,12 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     cpu.reset(&cpu,&memory);
 
     //LDY Zero Page,X
-    memory.Data[0xFFFC] = InsLDYZPY; //opdocde
+    memory.Data[0xFFFC] = InsLDYZPX; //opdocde
     memory.Data[0xFFFD] = 0x44; // adress
     memory.Data[0x46] = 20; //value
     cpu.X = 0x2;
     cpu.executeI(&cpu, &memory, 4);
-    printf("LDY Zero Page,x");
+    printf("LDY Zero Page,X");
     assertEqual(cpu.Y,20);
     printf("\n");
     cpu.reset(&cpu,&memory);
