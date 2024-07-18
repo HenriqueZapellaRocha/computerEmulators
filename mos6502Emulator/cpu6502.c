@@ -1,7 +1,7 @@
 #include "cpu6502.h"
 
 // Definição das instruções opcode
-const Byte InsLDAIM = 0xA9; // LDA load immediately
+const Byte InsLDAIM = 0xA9; // LDA load Immediate
 const Byte InsLDAZP = 0xA5; // LDA zero page
 const Byte InsLDAZPX = 0xB5; // LDA zero page X
 const Byte InsJSRABS = 0x20; // JSR absolute
@@ -10,6 +10,17 @@ const Byte InsLDAABSX = 0xBD;//LAD Absolute,X
 const Byte InsLDAABSY = 0xB9;//LAD Absolute,Y
 const Byte InsLDAINDX = 0xA1;//LAD Indirect,X
 const Byte InsLDAINDY = 0xB1;//LAD Indirect,Y
+const Byte InsLDXIM = 0xA2;//LDX Immediate
+const Byte InsLDXZP = 0xA6;//LDX Zero Page
+const Byte InsLDXZPY = 0xB6;//LDX Zero Page,Y
+const Byte InsLDXABS = 0xAE; //LDX Absolute
+const Byte InsLDXABSY = 0xBE;//LDX Absolute,Y
+const Byte InsLDYIM = 0xA0;//LDY Immediate
+const Byte InsLDYZP = 0xA4;//LDY Zero Page
+const Byte InsLDYZPY = 0xB4;//LDY Zero Page,Y
+const Byte InsLDYABS = 0xAC; //LDY Absolute
+const Byte InsLDYABSX = 0XBC; //LDY Absolute,X
+
 
 const u32 maxMemorySize = 1024 * 64;
 

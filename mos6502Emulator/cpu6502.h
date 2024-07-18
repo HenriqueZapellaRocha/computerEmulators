@@ -15,6 +15,16 @@ extern const Byte InsLDAABSX;//LAD Absolute,X
 extern const Byte InsLDAABSY;//LAD absolute,Y
 extern const Byte InsLDAINDX;//LAD Indirect,X
 extern const Byte InsLDAINDY;//LAD Indirect,Y
+extern const Byte InsLDXIM;//LDX Immediate
+extern const Byte InsLDXZP;//LDX Zero Page
+extern const Byte InsLDXZPY;//LDX Zero Page,Y
+extern const Byte InsLDXABS; //LDX Absolute
+extern const Byte InsLDXABSY;//LDX Absolute,Y
+extern const Byte InsLDYIM;//LDY Immediate
+extern const Byte InsLDYZP;//LDY Zero Page
+extern const Byte InsLDYZPY;//LDY Zero Page,Y
+extern const Byte InsLDYABS; //LDY Absolute
+extern const Byte InsLDYABSX; //LDY Absolute,X
 
 typedef struct Memory {
     Byte Data[1024 * 64];
@@ -56,3 +66,4 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles);
 void startCPUMEMORY(CPU *cpu, Memory *memory);
 Byte readByteInMemoryZeroPage(Memory *memory, u32 *cycles, Byte adrress);
 Byte readByteInMemory(Memory *memory, u32 *cycles, Word adrress);
+Word readWord(Memory *memory, u32 *cycles, Word adrress);
