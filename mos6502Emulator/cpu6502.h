@@ -61,7 +61,7 @@ void initMemory(Memory *memory);
 void writeWord(Word data, u32 address, Memory *memory, u32 *cycles);
 Word fetchWord(CPU *cpu, Memory *memory, u32 *cycles);
 Byte fetchInstrucstion(CPU *cpu, Memory *memory, u32 *cycles);
-void updateFlagsLDA(CPU *cpu);
+void updateFlagsLOAD(CPU *cpu);
 void executeI(CPU *cpu, Memory *memory, u32 cycles);
 void startCPUMEMORY(CPU *cpu, Memory *memory);
 Byte readByteInMemoryZeroPage(Memory *memory, u32 *cycles, Byte adrress);

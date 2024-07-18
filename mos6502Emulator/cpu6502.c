@@ -1,6 +1,7 @@
 #include "cpu6502.h"
 
-// Definição das instruções opcode
+//LOAD OPCODES
+//LDA
 const Byte InsLDAIM = 0xA9; // LDA load Immediate
 const Byte InsLDAZP = 0xA5; // LDA zero page
 const Byte InsLDAZPX = 0xB5; // LDA zero page X
@@ -10,11 +11,13 @@ const Byte InsLDAABSX = 0xBD;//LAD Absolute,X
 const Byte InsLDAABSY = 0xB9;//LAD Absolute,Y
 const Byte InsLDAINDX = 0xA1;//LAD Indirect,X
 const Byte InsLDAINDY = 0xB1;//LAD Indirect,Y
+//LDS
 const Byte InsLDXIM = 0xA2;//LDX Immediate
 const Byte InsLDXZP = 0xA6;//LDX Zero Page
 const Byte InsLDXZPY = 0xB6;//LDX Zero Page,Y
 const Byte InsLDXABS = 0xAE; //LDX Absolute
 const Byte InsLDXABSY = 0xBE;//LDX Absolute,Y
+//LDY
 const Byte InsLDYIM = 0xA0;//LDY Immediate
 const Byte InsLDYZP = 0xA4;//LDY Zero Page
 const Byte InsLDYZPY = 0xB4;//LDY Zero Page,Y
@@ -84,7 +87,7 @@ Byte fetchInstrucstion(CPU *cpu, Memory *memory, u32 *cycles) {
     return Data;
 }
 
-void updateFlagsLDA(CPU *cpu) {
+void updateFlagsLOAD(CPU *cpu) {
     if(cpu->ACC==0) {
         cpu->Z = 0x1;
     }
@@ -99,17 +102,18 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         Byte temp;
         switch (opcode)
         {
+        //LOAD LDA CASES
         case InsLDAIM: {
             temp = fetchInstrucstion(cpu, memory,&cycles);
             cpu->ACC = temp;
-            updateFlagsLDA(cpu);
+            updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAZP: {
             Byte adress = fetchInstrucstion(cpu,memory,&cycles);
             temp = readByteInMemoryZeroPage(memory, &cycles, adress);
             cpu->ACC = temp;
-            updateFlagsLDA(cpu);
+            updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAZPX: {
@@ -117,14 +121,14 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             adress += cpu->X;
             temp = readByteInMemoryZeroPage(memory, &cycles, adress);
             cpu->ACC = temp;
-            updateFlagsLDA(cpu);
+            updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABS: {
             Word adress = fetchWord(cpu,memory,&cycles);
             Byte data = readByteInMemory(memory,&cycles,adress);
             cpu->ACC = data;
-            updateFlagsLDA(cpu);
+            updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABSX: {
@@ -135,7 +139,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             if ((adress & 0xFF00) != (adressX & 0xFF00)) {
                 cycles--;
             }
-            updateFlagsLDA(cpu);
+            updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABSY: {
@@ -146,7 +150,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             if ((adress & 0xFF00) != (adressY & 0xFF00)) {
                 cycles--;
             }
-            updateFlagsLDA(cpu);
+            updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAINDX: {
@@ -155,7 +159,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             Word efectiveAdress = readWord(memory,&cycles,zeroPageBaseAdress);
             Byte value = readByteInMemory(memory,&cycles,efectiveAdress);
             cpu->ACC = value;
-            updateFlagsLDA(cpu);
+            updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAINDY: {
@@ -164,7 +168,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             Word efectiveadress = adress + cpu->Y;
             Byte value = readByteInMemory(memory,&cycles,efectiveadress);
             cpu->ACC = value;
-            updateFlagsLDA(cpu);
+            updateFlagsLOAD(cpu);
             if ((adress & 0xFF00) != (efectiveadress& 0xFF00)) {
                 cycles--;
             }
@@ -176,6 +180,46 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             memory->Data[cpu->SP] = (unsigned char)(cpu->PC - 1);
             cycles--;
             cpu->PC = subAddr;
+            break;
+        }
+        //LOAD LDX CASES
+        case InsLDXIM: {
+            temp = fetchInstrucstion(cpu, memory,&cycles);
+            cpu->X = temp;
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        case InsLDXZP: {
+            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
+            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
+            cpu->X = temp;
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        case InsLDXZPY: {
+            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
+            adress += cpu->Y;
+            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
+            cpu->X = temp;
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        case InsLDXABS: {
+            Word adress = fetchWord(cpu,memory,&cycles);
+            Byte data = readByteInMemory(memory,&cycles,adress);
+            cpu->X = data;
+            updateFlagsLOAD(cpu);
+            break;
+        }
+        case InsLDXABSY: {
+            Word adress = fetchWord(cpu,memory,&cycles);
+            Word adressX = adress + cpu->Y;
+            Byte data = readByteInMemory(memory,&cycles,adressX);
+            cpu->X = data;
+            if ((adress & 0xFF00) != (adressX & 0xFF00)) {
+                cycles--;
+            }
+            updateFlagsLOAD(cpu);
             break;
         }
         default:

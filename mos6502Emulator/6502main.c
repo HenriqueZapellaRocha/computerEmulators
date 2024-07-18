@@ -12,7 +12,7 @@ int main(void) {
     
     startCPUMEMORY(&cpu, &memory);
 
-    int testSelection = 3;
+    int testSelection = 2;
 
     switch (testSelection)
     {
@@ -31,6 +31,7 @@ int main(void) {
     default:
         return 0;
     }
+    /*
     //JSR 
     memory.Data[0xFFFC] = InsJSRABS; //opdocde
     memory.Data[0xFFFD] = 0x42; //adress
@@ -39,9 +40,9 @@ int main(void) {
     memory.Data[0x4243] = 10;
     cpu.executeI(&cpu, &memory, 8);
     printf("JSR TEST, EXEXPECTED 10, RESULT: %d", cpu.ACC);
-    printf("\n\n");;
+    printf("\n");;
     cpu.reset(&cpu,&memory);
-
+    */
     
     return 0; 
 }
@@ -58,7 +59,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 2);
     printf("LDA IMEDIATE TEST");
     assertEqual(cpu.ACC,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Zero Page
@@ -68,7 +69,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 3);
     printf("LDA Zero Page TEST");
     assertEqual(cpu.ACC,20);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Zero Page,X
@@ -79,7 +80,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 3);
     printf("LDA Zero Page,X");
     assertEqual(cpu.ACC,20);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute
@@ -90,7 +91,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDA Absolute TEST");
     assertEqual(cpu.ACC,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute,X
@@ -102,7 +103,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDA Absolute X TEST");
     assertEqual(cpu.ACC,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute,X (page boundry)
@@ -114,7 +115,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 5);
     printf("LDA Absolute X (with page boundry) TEST");
     assertEqual(cpu.ACC,0x37);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute,y
@@ -126,7 +127,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDA Absolute Y TEST");
     assertEqual(cpu.ACC,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Absolute,y (page boundry)
@@ -136,9 +137,9 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     memory.Data[0xFFFE] = 0x44; //adress
     memory.Data[0x4501/*cross page boundry*/] = 0x37; 
     cpu.executeI(&cpu, &memory, 5);
-    printf("LDA Absolute Y (with page boundry) TEST, EXEXPECTED 0x37, RESULT: 0x%x", cpu.ACC);
+    printf("LDA Absolute Y (with page boundry) TEST");
     assertEqual(cpu.ACC,0x37);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Inderect,X 
@@ -151,7 +152,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 6);
     printf("LDA Inderect,X TEST");
     assertEqual(cpu.ACC,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Inderect,Y
@@ -164,7 +165,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 5);
     printf("LDA Inderect,Y TEST");
     assertEqual(cpu.ACC,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDA Inderect,Y (Page boundry)
@@ -177,7 +178,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 6);
     printf("LDA Inderect,Y (Page Boundry) TEST");
     assertEqual(cpu.ACC,10);
-    printf("\n\n");;
+    printf("\n");;
     cpu.reset(&cpu,&memory);
 }
 
@@ -189,7 +190,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 2);
     printf("LDX IMEDIATE TEST");
     assertEqual(cpu.X,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDX Zero Page
@@ -199,7 +200,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 3);
     printf("LDX Zero Page TEST");
     assertEqual(cpu.X,20);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDX Zero Page,Y
@@ -210,7 +211,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDX Zero Page,Y");
     assertEqual(cpu.X,20);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDX Absolute
@@ -221,7 +222,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDX Absolute TEST");
     assertEqual(cpu.X,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDX Absolute,y
@@ -233,7 +234,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDX Absolute Y TEST");
     assertEqual(cpu.X,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDX Absolute,y (page boundry)
@@ -245,7 +246,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 5);
     printf("LDX Absolute Y (with page boundry) TEST");
     assertEqual(cpu.X,0x37);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
 }
@@ -258,7 +259,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 2);
     printf("LDY IMEDIATE TEST");
     assertEqual(cpu.Y,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDY Zero Page
@@ -268,7 +269,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 3);
     printf("LDY Zero Page TEST");
     assertEqual(cpu.Y,20);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDY Zero Page,X
@@ -279,7 +280,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDY Zero Page,x");
     assertEqual(cpu.Y,20);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDY Absolute
@@ -290,7 +291,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDY Absolute TEST");
     assertEqual(cpu.Y,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDY Absolute,X
@@ -302,7 +303,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     printf("LDY Absolute X TEST");
     assertEqual(cpu.Y,10);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
     //LDY Absolute,X (page boundry)
@@ -314,7 +315,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 5);
     printf("LDY Absolute X (with page boundry) TEST");
     assertEqual(cpu.Y,0x37);
-    printf("\n\n");
+    printf("\n");
     cpu.reset(&cpu,&memory);
 
 }
