@@ -67,3 +67,4 @@ void startCPUMEMORY(CPU *cpu, Memory *memory);
 Byte readByteInMemoryZeroPage(Memory *memory, u32 *cycles, Byte adrress);
 Byte readByteInMemory(Memory *memory, u32 *cycles, Word adrress);
 Word readWord(Memory *memory, u32 *cycles, Word adrress);
+Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles);

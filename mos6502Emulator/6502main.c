@@ -12,7 +12,7 @@ int main(void) {
     
     startCPUMEMORY(&cpu, &memory);
 
-    int testSelection = 3;
+    int testSelection = 1;
 
     switch (testSelection)
     {

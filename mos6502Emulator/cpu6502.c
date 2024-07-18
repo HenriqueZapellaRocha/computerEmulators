@@ -96,6 +96,71 @@ void updateFlagsLOAD(CPU *cpu) {
     }
 }
 
+Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte adress = fetchInstrucstion(cpu,memory,cycles);
+    Byte value = readByteInMemoryZeroPage(memory,cycles, adress);
+    return value;
+}
+
+Byte zeroPageXAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte adress = fetchInstrucstion(cpu,memory,cycles);
+    adress += cpu->X;
+    Byte temp = readByteInMemoryZeroPage(memory, cycles, adress);
+    return temp;
+}
+
+Byte zeroPageYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte adress = fetchInstrucstion(cpu,memory,cycles);
+    adress += cpu->Y;
+    Byte temp = readByteInMemoryZeroPage(memory, cycles, adress);
+    return temp;
+}
+
+Byte absoluteAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Word adress = fetchWord(cpu,memory,cycles);
+    Byte data = readByteInMemory(memory,cycles,adress);
+    return data;
+}
+
+Byte absoluteXAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Word adress = fetchWord(cpu,memory,cycles);
+    Word adressX = adress + cpu->X;
+    Byte data = readByteInMemory(memory,cycles,adressX);
+    if ((adress & 0xFF00) != (adressX & 0xFF00)) {
+        cycles--;
+    }
+    return data;
+}
+
+Byte absoluteYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Word adress = fetchWord(cpu,memory,cycles);
+    Word adressX = adress + cpu->Y;
+    Byte data = readByteInMemory(memory,cycles,adressX);
+    if ((adress & 0xFF00) != (adressX & 0xFF00)) {
+        cycles--;
+    }
+    return data;
+}
+
+Byte indirectX(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte tempAdress = fetchInstrucstion(cpu,memory,cycles);
+    Word zeroPageBaseAdress = tempAdress + cpu->X;
+    Word efectiveAdress = readWord(memory,cycles,zeroPageBaseAdress);
+    Byte value = readByteInMemory(memory,cycles,efectiveAdress);
+    return value;
+}
+
+Byte indirectY(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte ZeroPageAdress = fetchInstrucstion(cpu,memory,cycles);
+    Word adress = readWord(memory,cycles,ZeroPageAdress);
+    Word efectiveadress = adress + cpu->Y;
+    Byte value = readByteInMemory(memory,cycles,efectiveadress);
+    if ((adress & 0xFF00) != (efectiveadress& 0xFF00)) {
+    cycles--;
+    }
+    return value;
+}
+
 void executeI(CPU *cpu, Memory *memory, u32 cycles) {
     while(cycles > 0) {
         Byte opcode = fetchInstrucstion(cpu, memory, &cycles);
@@ -110,68 +175,38 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             break;
         }
         case InsLDAZP: {
-            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
-            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
-            cpu->ACC = temp;
+            cpu->ACC = zeroPageAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAZPX: {
-            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
-            adress += cpu->X;
-            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
-            cpu->ACC = temp;
+            cpu->ACC = zeroPageXAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABS: {
-            Word adress = fetchWord(cpu,memory,&cycles);
-            Byte data = readByteInMemory(memory,&cycles,adress);
-            cpu->ACC = data;
+            cpu->ACC = absoluteAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABSX: {
-            Word adress = fetchWord(cpu,memory,&cycles);
-            Word adressX = adress + cpu->X;
-            Byte data = readByteInMemory(memory,&cycles,adressX);
-            cpu->ACC = data;
-            if ((adress & 0xFF00) != (adressX & 0xFF00)) {
-                cycles--;
-            }
+            cpu->ACC = absoluteXAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABSY: {
-            Word adress = fetchWord(cpu,memory,&cycles);
-            Word adressY = adress + cpu->Y;
-            Byte data = readByteInMemory(memory,&cycles,adressY);
-            cpu->ACC = data;
-            if ((adress & 0xFF00) != (adressY & 0xFF00)) {
-                cycles--;
-            }
+            cpu->ACC = absoluteYAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAINDX: {
-            Byte tempAdress = fetchInstrucstion(cpu,memory,&cycles);
-            Word zeroPageBaseAdress = tempAdress + cpu->X;
-            Word efectiveAdress = readWord(memory,&cycles,zeroPageBaseAdress);
-            Byte value = readByteInMemory(memory,&cycles,efectiveAdress);
-            cpu->ACC = value;
+            cpu->ACC = indirectX(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAINDY: {
-            Byte ZeroPageAdress = fetchInstrucstion(cpu,memory,&cycles);
-            Word adress = readWord(memory,&cycles,ZeroPageAdress);
-            Word efectiveadress = adress + cpu->Y;
-            Byte value = readByteInMemory(memory,&cycles,efectiveadress);
-            cpu->ACC = value;
+            cpu->ACC = indirectY(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
-            if ((adress & 0xFF00) != (efectiveadress& 0xFF00)) {
-                cycles--;
-            }
             break;
         }
         case InsJSRABS: {
@@ -190,39 +225,26 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             break;
         }
         case InsLDXZP: {
-            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
-            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
-            cpu->X = temp;
+            cpu->X = zeroPageAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDXZPY: {
-            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
-            adress += cpu->Y;
-            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
-            cpu->X = temp;
+            cpu->X = zeroPageYAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDXABS: {
-            Word adress = fetchWord(cpu,memory,&cycles);
-            Byte data = readByteInMemory(memory,&cycles,adress);
-            cpu->X = data;
+            cpu->X = absoluteAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDXABSY: {
-            Word adress = fetchWord(cpu,memory,&cycles);
-            Word adressX = adress + cpu->Y;
-            Byte data = readByteInMemory(memory,&cycles,adressX);
-            cpu->X = data;
-            if ((adress & 0xFF00) != (adressX & 0xFF00)) {
-                cycles--;
-            }
+            cpu->X = absoluteYAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
-        //LOAD LDX CASES
+        //LOAD LDY CASES
         case InsLDYIM: {
             temp = fetchInstrucstion(cpu, memory,&cycles);
             cpu->Y = temp;
@@ -230,35 +252,22 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             break;
         }
         case InsLDYZP: {
-            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
-            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
-            cpu->Y = temp;
+            cpu->Y = zeroPageAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDYZPX: {
-            Byte adress = fetchInstrucstion(cpu,memory,&cycles);
-            adress += cpu->X;
-            temp = readByteInMemoryZeroPage(memory, &cycles, adress);
-            cpu->Y = temp;
+            cpu->Y = zeroPageXAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDYABS: {
-            Word adress = fetchWord(cpu,memory,&cycles);
-            Byte data = readByteInMemory(memory,&cycles,adress);
-            cpu->Y = data;
+            cpu->Y = absoluteAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDYABSX: {
-            Word adress = fetchWord(cpu,memory,&cycles);
-            Word adressX = adress + cpu->X;
-            Byte data = readByteInMemory(memory,&cycles,adressX);
-            cpu->Y = data;
-            if ((adress & 0xFF00) != (adressX & 0xFF00)) {
-                cycles--;
-            }
+            cpu->Y = absoluteXAdress(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
