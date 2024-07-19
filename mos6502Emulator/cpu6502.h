@@ -32,9 +32,12 @@ extern const Byte InsSTAABSX;//STA Absolute,X
 extern const Byte InsSTAABSY;//STA Absolute,Y
 extern const Byte InsSTAINDX;//STA Indirect,X
 extern const Byte InsSTAINDY;//STA Indirect,Y
-
-
-
+extern const Byte InsSTXZP;//STX Zero Page
+extern const Byte InsSTXZPY;//STX Zero Page,Y
+extern const Byte InsSTXABS;//STX Absolute
+extern const Byte InsSTYZP;//STY Zero Page
+extern const Byte InsSTYZPX;//STY Zero Page,X
+extern const Byte InsSTYABS;//STX Absolute
 
 typedef struct Memory {
     Byte Data[1024 * 64];

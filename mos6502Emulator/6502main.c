@@ -6,6 +6,8 @@ void LoadAInstructionsTest(CPU cpu, Memory memory);
 void LoadXInstructionsTest(CPU cpu, Memory memory);
 void LoadYInstructionsTest(CPU cpu, Memory memory);
 void StoreAInstructionsTest(CPU cpu, Memory memory);
+void StoreXInstructionsTest(CPU cpu, Memory memory);
+void StoreYInstructionsTest(CPU cpu, Memory memory);
 
 int main(void) {
     CPU cpu;
@@ -13,7 +15,7 @@ int main(void) {
     
     startCPUMEMORY(&cpu, &memory);
 
-    int testSelection = 4;
+    int testSelection = 6;
 
     switch (testSelection)
     {
@@ -31,6 +33,14 @@ int main(void) {
     }
     case 4: {
         StoreAInstructionsTest(cpu,memory);
+        break;
+    }
+    case 5: {
+        StoreXInstructionsTest(cpu,memory);
+        break;
+    }
+    case 6: {
+        StoreYInstructionsTest(cpu,memory);
         break;
     }
     default:
@@ -414,5 +424,83 @@ void StoreAInstructionsTest(CPU cpu, Memory memory) {
     cpu.reset(&cpu,&memory);
 
 }
+
+void StoreXInstructionsTest(CPU cpu, Memory memory) {
+    //STX Zero page
+    cpu.X = 10;
+    memory.Data[0xFFFC] = InsSTXZP; //opdocde
+    memory.Data[0xFFFD] = 0x2;
+    memory.Data[0x2] = 0;
+    printf("STX Zero Page TEST");
+    cpu.executeI(&cpu,&memory,3);
+    assertEqual(memory.Data[0x2],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STX Zero page,Y
+    cpu.Y = 0X10;
+    cpu.X = 10;
+    memory.Data[0xFFFC] = InsSTXZPY; //opdocde
+    memory.Data[0xFFFD] = 0x2;
+    memory.Data[0x02 + 0x10] = 0;
+    printf("STX Zero Page,Y TEST");
+    cpu.executeI(&cpu,&memory,4);
+    assertEqual(memory.Data[0x02 + 0x10],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STX Absolute
+    cpu.X = 10;
+    memory.Data[0xFFFC] = InsSTXABS; //opdocde
+    memory.Data[0xFFFD] = 0x42; //adress
+    memory.Data[0xFFFE] = 0x42; //adress
+    memory.Data[0x4242] = 0; //value
+    printf("STX Absolute TEST");
+    cpu.executeI(&cpu, &memory, 4);
+    assertEqual(memory.Data[0x4242],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+}
+
+void StoreYInstructionsTest(CPU cpu, Memory memory) {
+    //STY Zero page
+    cpu.Y = 10;
+    memory.Data[0xFFFC] = InsSTYZP; //opdocde
+    memory.Data[0xFFFD] = 0x2;
+    memory.Data[0x2] = 0;
+    printf("STX Zero Page TEST");
+    cpu.executeI(&cpu,&memory,3);
+    assertEqual(memory.Data[0x2],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STY Zero page,X
+    cpu.X = 0X10;
+    cpu.Y = 10;
+    memory.Data[0xFFFC] = InsSTYZPX; //opdocde
+    memory.Data[0xFFFD] = 0x2;
+    memory.Data[0x02 + 0x10] = 0;
+    printf("STX Zero Page,Y TEST");
+    cpu.executeI(&cpu,&memory,4);
+    assertEqual(memory.Data[0x02 + 0x10],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STY Absolute
+    cpu.Y = 10;
+    memory.Data[0xFFFC] = InsSTYABS; //opdocde
+    memory.Data[0xFFFD] = 0x42; //adress
+    memory.Data[0xFFFE] = 0x42; //adress
+    memory.Data[0x4242] = 0; //value
+    printf("STX Absolute TEST");
+    cpu.executeI(&cpu, &memory, 4);
+    assertEqual(memory.Data[0x4242],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+}
+
+
 
 

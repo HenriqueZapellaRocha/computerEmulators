@@ -34,6 +34,15 @@ const Byte InsSTAABSX = 0x9D;//STA Absolute,X
 const Byte InsSTAABSY = 0x99;//STA Absolute,Y
 const Byte InsSTAINDX = 0x81;//STA Indirect,X
 const Byte InsSTAINDY = 0x91;//STA Indirect,Y
+//STX
+const Byte InsSTXZP = 0x86;//STX Zero Page
+const Byte InsSTXZPY = 0x96;//STX Zero Page,Y
+const Byte InsSTXABS = 0x8E;//STX Absolute
+//STY
+const Byte InsSTYZP = 0x84;//STY Zero Page
+const Byte InsSTYZPX = 0x94;//STY Zero Page,X
+const Byte InsSTYABS = 0x8C;//STX Absolute
+
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -125,6 +134,13 @@ Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles) {
 Byte zeroPageXAdress(CPU *cpu, Memory *memory,u32 *cycles) {
     Byte zpAdrees = fetchInstrucstion(cpu,memory,cycles);
     Byte finalAdress = cpu->X + zpAdrees;
+    (*cycles)--;
+    return finalAdress;
+}
+
+Byte zeroPageYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte zpAdrees = fetchInstrucstion(cpu,memory,cycles);
+    Byte finalAdress = cpu->Y + zpAdrees;
     (*cycles)--;
     return finalAdress;
 }
@@ -365,6 +381,38 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         case InsSTAINDY: {
             Word addres = indirectYAdress(cpu,memory,&cycles);
             writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            break;
+        }
+        //Store STX CASES 
+        case InsSTXZP: {
+            Byte addres = zeroPageAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->X, memory,&cycles,addres);
+            break;
+        }
+        case InsSTXZPY: {
+            Byte addres = zeroPageYAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->X, memory,&cycles,addres);
+            break;
+        }
+        case InsSTXABS: {
+            Word addres = AbsoluteAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->X, memory,&cycles,addres);
+            break;
+        }
+        //Store STY CASES 
+        case InsSTYZP: {
+            Byte addres = zeroPageAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->Y, memory,&cycles,addres);
+            break;
+        }
+        case InsSTYZPX: {
+            Byte addres = zeroPageXAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->Y, memory,&cycles,addres);
+            break;
+        }
+        case InsSTYABS: {
+            Word addres = AbsoluteAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->Y, memory,&cycles,addres);
             break;
         }
         default:
