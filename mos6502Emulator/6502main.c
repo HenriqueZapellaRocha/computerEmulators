@@ -8,6 +8,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory);
 void StoreAInstructionsTest(CPU cpu, Memory memory);
 void StoreXInstructionsTest(CPU cpu, Memory memory);
 void StoreYInstructionsTest(CPU cpu, Memory memory);
+void stackOperationsTest(CPU cpu, Memory memory);
 
 int main(void) {
     CPU cpu;
@@ -15,7 +16,7 @@ int main(void) {
     
     startCPUMEMORY(&cpu, &memory);
 
-    int testSelection = 6;
+    int testSelection = 7;
 
     switch (testSelection)
     {
@@ -43,23 +44,14 @@ int main(void) {
         StoreYInstructionsTest(cpu,memory);
         break;
     }
+    case 7: {
+        stackOperationsTest(cpu,memory);
+        break;
+    }
     default:
         return 0;
     }
 
-    /*
-    //JSR 
-    memory.Data[0xFFFC] = InsJSRABS; //opdocde
-    memory.Data[0xFFFD] = 0x42; //adress
-    memory.Data[0xFFFE] = 0x42; //adress
-    memory.Data[0x4242] = InsLDAIM; //immediate lda
-    memory.Data[0x4243] = 10;
-    cpu.executeI(&cpu, &memory, 8);
-    printf("JSR TEST, EXEXPECTED 10, RESULT: %d", cpu.ACC);
-    printf("\n");;
-    cpu.reset(&cpu,&memory);
-    */
-    
     return 0; 
 }
 
@@ -76,7 +68,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA IMEDIATE TEST");
     assertEqual(cpu.ACC,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Zero Page
     memory.Data[0xFFFC] = InsLDAZP; //opdocde
@@ -86,7 +78,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Zero Page TEST");
     assertEqual(cpu.ACC,20);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Zero Page,X
     memory.Data[0xFFFC] = InsLDAZPX; //opdocde
@@ -97,7 +89,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Zero Page,X");
     assertEqual(cpu.ACC,20);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Absolute
     memory.Data[0xFFFC] = InsLDAABS; //opdocde
@@ -108,7 +100,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Absolute TEST");
     assertEqual(cpu.ACC,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Absolute,X
     cpu.X = 1;
@@ -120,7 +112,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Absolute X TEST");
     assertEqual(cpu.ACC,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Absolute,X (page boundry)
     cpu.X = 0xFF;
@@ -132,7 +124,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Absolute X (with page boundry) TEST");
     assertEqual(cpu.ACC,0x37);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Absolute,y
     cpu.Y = 1;
@@ -144,7 +136,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Absolute Y TEST");
     assertEqual(cpu.ACC,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Absolute,y (page boundry)
     cpu.Y = 0xFF;
@@ -156,7 +148,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Absolute Y (with page boundry) TEST");
     assertEqual(cpu.ACC,0x37);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Inderect,X 
     cpu.X = 0x04;
@@ -169,7 +161,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Inderect,X TEST");
     assertEqual(cpu.ACC,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Inderect,Y
     cpu.Y = 0x4;
@@ -182,7 +174,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Inderect,Y TEST");
     assertEqual(cpu.ACC,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDA Inderect,Y (Page boundry)
     cpu.Y = 0xFF;
@@ -195,7 +187,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     printf("LDA Inderect,Y (Page Boundry) TEST");
     assertEqual(cpu.ACC,10);
     printf("\n");;
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 }
 
 void LoadXInstructionsTest(CPU cpu, Memory memory) {
@@ -207,7 +199,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     printf("LDX IMEDIATE TEST");
     assertEqual(cpu.X,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDX Zero Page
     memory.Data[0xFFFC] = InsLDXZP; //opdocde
@@ -217,7 +209,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     printf("LDX Zero Page TEST");
     assertEqual(cpu.X,20);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDX Zero Page,Y
     memory.Data[0xFFFC] = InsLDXZPY; //opdocde
@@ -228,7 +220,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     printf("LDX Zero Page,Y");
     assertEqual(cpu.X,20);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDX Absolute
     memory.Data[0xFFFC] = InsLDXABS; //opdocde
@@ -239,7 +231,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     printf("LDX Absolute TEST");
     assertEqual(cpu.X,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDX Absolute,y
     cpu.Y = 1;
@@ -251,7 +243,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     printf("LDX Absolute Y TEST");
     assertEqual(cpu.X,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDX Absolute,y (page boundry)
     cpu.Y = 0xFF;
@@ -263,7 +255,7 @@ void LoadXInstructionsTest(CPU cpu, Memory memory) {
     printf("LDX Absolute Y (with page boundry) TEST");
     assertEqual(cpu.X,0x37);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
 }
 
@@ -276,7 +268,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     printf("LDY IMEDIATE TEST");
     assertEqual(cpu.Y,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDY Zero Page
     memory.Data[0xFFFC] = InsLDYZP; //opdocde
@@ -286,7 +278,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     printf("LDY Zero Page TEST");
     assertEqual(cpu.Y,20);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDY Zero Page,X
     memory.Data[0xFFFC] = InsLDYZPX; //opdocde
@@ -297,7 +289,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     printf("LDY Zero Page,X");
     assertEqual(cpu.Y,20);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDY Absolute
     memory.Data[0xFFFC] = InsLDYABS; //opdocde
@@ -308,7 +300,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     printf("LDY Absolute TEST");
     assertEqual(cpu.Y,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDY Absolute,X
     cpu.X = 1;
@@ -320,7 +312,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     printf("LDY Absolute X TEST");
     assertEqual(cpu.Y,10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //LDY Absolute,X (page boundry)
     cpu.X = 0xFF;
@@ -332,7 +324,7 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     printf("LDY Absolute X (with page boundry) TEST");
     assertEqual(cpu.Y,0x37);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 }
 
 void StoreAInstructionsTest(CPU cpu, Memory memory) {
@@ -345,7 +337,7 @@ void StoreAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu,&memory,3);
     assertEqual(memory.Data[0x2],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STA Zero page,X
     cpu.ACC = 10;
@@ -357,7 +349,7 @@ void StoreAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu,&memory,4);
     assertEqual(memory.Data[0x02 + 0x10],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STA Absolute
     cpu.ACC = 10;
@@ -369,7 +361,7 @@ void StoreAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     assertEqual(memory.Data[0x4242],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STA Absolute,X
     cpu.ACC = 10;
@@ -381,7 +373,7 @@ void StoreAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 5);
     assertEqual(memory.Data[0x40 + 0XFF],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STA Absolute,Y
     cpu.ACC = 10;
@@ -393,7 +385,7 @@ void StoreAInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 5);
     assertEqual(memory.Data[0x40+0xFF],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STA Indirect,X
     cpu.ACC = 10;
@@ -407,7 +399,7 @@ void StoreAInstructionsTest(CPU cpu, Memory memory) {
     printf("STA Indirect,X TEST");
     assertEqual(memory.Data[0x8000],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STA Indirect,Y
     cpu.ACC = 10;
@@ -421,7 +413,7 @@ void StoreAInstructionsTest(CPU cpu, Memory memory) {
     printf("STA Indirect,Y TEST");
     assertEqual(memory.Data[0x8000 + 0xF],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
 }
 
@@ -435,7 +427,7 @@ void StoreXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu,&memory,3);
     assertEqual(memory.Data[0x2],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STX Zero page,Y
     cpu.Y = 0X10;
@@ -447,7 +439,7 @@ void StoreXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu,&memory,4);
     assertEqual(memory.Data[0x02 + 0x10],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STX Absolute
     cpu.X = 10;
@@ -459,7 +451,7 @@ void StoreXInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     assertEqual(memory.Data[0x4242],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
 }
 
@@ -473,7 +465,7 @@ void StoreYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu,&memory,3);
     assertEqual(memory.Data[0x2],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STY Zero page,X
     cpu.X = 0X10;
@@ -485,7 +477,7 @@ void StoreYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu,&memory,4);
     assertEqual(memory.Data[0x02 + 0x10],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
     //STY Absolute
     cpu.Y = 10;
@@ -497,8 +489,22 @@ void StoreYInstructionsTest(CPU cpu, Memory memory) {
     cpu.executeI(&cpu, &memory, 4);
     assertEqual(memory.Data[0x4242],10);
     printf("\n");
-    cpu.reset(&cpu,&memory);
+    cpu.reset(&cpu,&memory,0);
 
+}
+
+void stackOperationsTest(CPU cpu, Memory memory) {
+
+    cpu.reset(&cpu,&memory,0xFF00);
+    memory.Data[0xFF00] = InsJSRABS;
+    memory.Data[0xFF01] = 0x00;
+    memory.Data[0xFF02] = 0x80;
+    memory.Data[0x8000] = InsRTSIMP;
+    memory.Data[0xFF03] = InsLDAIM;
+    memory.Data[0xFF04] = 10;
+    printf("JSR AND RTS TEST");
+    cpu.executeI(&cpu, &memory, 14);
+    assertEqual(cpu.ACC, 10);
 }
 
 

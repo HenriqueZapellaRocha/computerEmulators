@@ -38,6 +38,7 @@ extern const Byte InsSTXABS;//STX Absolute
 extern const Byte InsSTYZP;//STY Zero Page
 extern const Byte InsSTYZPX;//STY Zero Page,X
 extern const Byte InsSTYABS;//STX Absolute
+const Byte InsRTSIMP;//RTS IMPLIED 
 
 typedef struct Memory {
     Byte Data[1024 * 64];
@@ -61,7 +62,7 @@ typedef struct CPU {
     Byte O : 1; //Overflow Flag
     Byte N : 1; //Negative Flag
     
-    void (*reset)(struct CPU *cpu, struct Memory *memory);
+    void (*reset)(struct CPU *cpu, struct Memory *memory, Word pc);
     void (*executeI)(struct CPU *cpu, struct Memory *memory, u32 cycles);
     Byte (*fetchInstrucstion)(struct CPU *cpu, struct Memory *memory, u32 *cycles);
     Byte (*readByteInMemoryZeroPage)(struct Memory *Memory, u32 *cycles, Byte adress);
@@ -69,7 +70,7 @@ typedef struct CPU {
     Byte (*readByteInMemory)(struct Memory *memory, u32 *cycles, Word adrress);
 } CPU;
 
-void reset(CPU *cpu, Memory *memory);
+void reset(CPU *cpu, Memory *memory,Word pc);
 void initMemory(Memory *memory);
 void writeWord(Word data, u32 address, Memory *memory, u32 *cycles);
 Word fetchWord(CPU *cpu, Memory *memory, u32 *cycles);

@@ -3,11 +3,10 @@
 
 //LOAD OPCODES
 //LDA
-const Byte InsLDAIM = 0xA9; // LDA load Immediate
-const Byte InsLDAZP = 0xA5; // LDA zero page
-const Byte InsLDAZPX = 0xB5; // LDA zero page X
-const Byte InsJSRABS = 0x20; // JSR absolute
-const Byte InsLDAABS = 0xAD; //LAD Absolute
+const Byte InsLDAIM = 0xA9;// LDA load Immediate
+const Byte InsLDAZP = 0xA5;// LDA zero page
+const Byte InsLDAZPX = 0xB5;// LDA zero page X
+const Byte InsLDAABS = 0xAD;//LAD Absolute
 const Byte InsLDAABSX = 0xBD;//LAD Absolute,X
 const Byte InsLDAABSY = 0xB9;//LAD Absolute,Y
 const Byte InsLDAINDX = 0xA1;//LAD Indirect,X
@@ -43,12 +42,19 @@ const Byte InsSTYZP = 0x84;//STY Zero Page
 const Byte InsSTYZPX = 0x94;//STY Zero Page,X
 const Byte InsSTYABS = 0x8C;//STX Absolute
 
+//STACK OPERATIONS OPCODES
+const Byte InsJSRABS = 0x20;// JSR absolute
+const Byte InsRTSIMP = 0x60;//RTS IMPLIED 
 
 const u32 maxMemorySize = 1024 * 64;
 
 
-void reset(CPU *cpu, Memory *memory) {
+void reset(CPU *cpu, Memory *memory,Word pc) {
+    if(pc == 0) {
     cpu->PC = 0x0FFFC;
+    } else {
+    cpu->PC = pc;
+    }
     cpu->SP = 0xFF;
     cpu->ACC = cpu->X = cpu->Y = 0;
     cpu->C = cpu->Z = cpu->I = cpu->D = cpu->B = cpu->O = cpu->N = 0;
@@ -258,6 +264,20 @@ Word indirectYAdress6(CPU *cpu, Memory *memory,u32 *cycles) {
     return efectiveadress;
 }
 
+void PcToStack(CPU *cpu, Memory *memory, u32 *cycles) {
+    Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
+    writeWord(cpu->PC-1, stackAddress-1,memory,cycles);
+    cpu->SP -= 2;
+}
+
+Word popStack(Memory *memory, u32 *cycles, CPU *cpu) {
+    Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
+    Word returnAddr = readWord(memory,cycles,stackAddress+1);
+    cpu->SP += 2;
+    (*cycles)--;
+    return returnAddr;
+}
+
 void executeI(CPU *cpu, Memory *memory, u32 cycles) {
     while(cycles > 0) {
         Byte opcode = fetchInstrucstion(cpu, memory, &cycles);
@@ -304,13 +324,6 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         case InsLDAINDY: {
             cpu->ACC = indirectYValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
-            break;
-        }
-        case InsJSRABS: {
-            Word subAddr = fetchWord(cpu,memory,&cycles);
-            writeWord(cpu->PC-1, cpu->SP,memory,&cycles);
-            memory->Data[cpu->SP] = (unsigned char)(cpu->PC - 1);
-            cpu->PC = subAddr;
             break;
         }
         //LOAD LDX CASES
@@ -435,6 +448,21 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             writeByteInMemoryFromRegister(cpu->Y, memory,&cycles,addres);
             break;
         }
+        //JSR INSTRUCTION 
+        case InsJSRABS: {
+            Word subAddr = fetchWord(cpu,memory,&cycles);
+            PcToStack(cpu,memory,&cycles); //puting the retun adress in the stack
+            cpu->PC = subAddr;
+            cycles--;
+            break;
+        }
+        //RTS INSTRUCTION 
+        case InsRTSIMP: {
+            Word adress = popStack(memory,&cycles,cpu);
+            cpu->PC = adress+1;
+            cycles -=2;
+            break;
+        }
         default:
             printf("\ninstruction not exist\n");
             return;
@@ -451,5 +479,5 @@ void startCPUMEMORY(CPU *cpu, Memory *memory) {
     (*cpu).readByteInMemory = readByteInMemory;
     (*cpu).fetchWord = fetchWord;
     (*memory).initMemory = initMemory;
-    (*cpu).reset(cpu,memory);
+    (*cpu).reset(cpu,memory,0);
 }
