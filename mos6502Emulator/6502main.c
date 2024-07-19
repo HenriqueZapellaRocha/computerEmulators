@@ -5,6 +5,7 @@
 void LoadAInstructionsTest(CPU cpu, Memory memory); 
 void LoadXInstructionsTest(CPU cpu, Memory memory);
 void LoadYInstructionsTest(CPU cpu, Memory memory);
+void StoreAInstructionsTest(CPU cpu, Memory memory);
 
 int main(void) {
     CPU cpu;
@@ -12,7 +13,7 @@ int main(void) {
     
     startCPUMEMORY(&cpu, &memory);
 
-    int testSelection = 1;
+    int testSelection = 4;
 
     switch (testSelection)
     {
@@ -28,9 +29,14 @@ int main(void) {
         LoadYInstructionsTest(cpu,memory);
         break;
     }
+    case 4: {
+        StoreAInstructionsTest(cpu,memory);
+        break;
+    }
     default:
         return 0;
     }
+
     /*
     //JSR 
     memory.Data[0xFFFC] = InsJSRABS; //opdocde
@@ -77,7 +83,7 @@ void LoadAInstructionsTest(CPU cpu, Memory memory) {
     memory.Data[0xFFFD] = 0x44; // adress
     memory.Data[0x46] = 20; //value
     cpu.X = 0x2;
-    cpu.executeI(&cpu, &memory, 3);
+    cpu.executeI(&cpu, &memory, 4);
     printf("LDA Zero Page,X");
     assertEqual(cpu.ACC,20);
     printf("\n");
@@ -317,6 +323,96 @@ void LoadYInstructionsTest(CPU cpu, Memory memory) {
     assertEqual(cpu.Y,0x37);
     printf("\n");
     cpu.reset(&cpu,&memory);
+}
+
+void StoreAInstructionsTest(CPU cpu, Memory memory) {
+    //STA Zero page
+    cpu.ACC = 10;
+    memory.Data[0xFFFC] = InsSTAZP; //opdocde
+    memory.Data[0xFFFD] = 0x2;
+    memory.Data[0x2] = 0;
+    printf("STA Zero Page TEST");
+    cpu.executeI(&cpu,&memory,3);
+    assertEqual(memory.Data[0x2],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STA Zero page,X
+    cpu.ACC = 10;
+    cpu.X = 0x10;
+    memory.Data[0xFFFC] = InsSTAZPX; //opdocde
+    memory.Data[0xFFFD] = 0x2;
+    memory.Data[0x02 + 0x10] = 0;
+    printf("STA Zero Page,X TEST");
+    cpu.executeI(&cpu,&memory,4);
+    assertEqual(memory.Data[0x02 + 0x10],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STA Absolute
+    cpu.ACC = 10;
+    memory.Data[0xFFFC] = InsSTAABS; //opdocde
+    memory.Data[0xFFFD] = 0x42; //adress
+    memory.Data[0xFFFE] = 0x42; //adress
+    memory.Data[0x4242] = 0; //value
+    printf("STA Absolute TEST");
+    cpu.executeI(&cpu, &memory, 4);
+    assertEqual(memory.Data[0x4242],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STA Absolute,X
+    cpu.ACC = 10;
+    cpu.X = 0x40;
+    memory.Data[0xFFFC] = InsSTAABSX; //opdocde
+    memory.Data[0xFFFD] = 0xFF; //adress
+    memory.Data[0x40 + 0XFF] = 0; //value
+    printf("STA Absolute,X TEST");
+    cpu.executeI(&cpu, &memory, 5);
+    assertEqual(memory.Data[0x40 + 0XFF],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STA Absolute,Y
+    cpu.ACC = 10;
+    cpu.Y = 0x40;
+    memory.Data[0xFFFC] = InsSTAABSY; //opdocde
+    memory.Data[0xFFFD] = 0xFF; //adress
+    memory.Data[0x40 + 0xFF] = 0; //value
+    printf("STA Absolute,Y TEST");
+    cpu.executeI(&cpu, &memory, 5);
+    assertEqual(memory.Data[0x40+0xFF],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STA Indirect,X
+    cpu.ACC = 10;
+    cpu.X = 0x0F;
+    memory.Data[0xFFFC] = InsSTAINDX; //opdocde
+    memory.Data[0xFFFD] = 0x20; //adress
+    memory.Data[0x002F] = 0x0; //adress
+    memory.Data[0x0030] = 0x80;
+    memory.Data[0x8000] = 0; //value
+    cpu.executeI(&cpu, &memory, 6);
+    printf("STA Indirect,X TEST");
+    assertEqual(memory.Data[0x8000],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
+
+    //STA Indirect,Y
+    cpu.ACC = 10;
+    cpu.Y = 0x0F;
+    memory.Data[0xFFFC] = InsSTAINDY; //opdocde
+    memory.Data[0xFFFD] = 0x20; //adress
+    memory.Data[0x0020] = 0x0; //adress
+    memory.Data[0x0021] = 0x80;
+    memory.Data[0x8000 + 0x0F] = 0; //value
+    cpu.executeI(&cpu, &memory, 6);
+    printf("STA Indirect,Y TEST");
+    assertEqual(memory.Data[0x8000 + 0xF],10);
+    printf("\n");
+    cpu.reset(&cpu,&memory);
 
 }
+
 

@@ -1,4 +1,5 @@
 #include "cpu6502.h"
+#include <stdio.h>
 
 //LOAD OPCODES
 //LDA
@@ -24,6 +25,15 @@ const Byte InsLDYZPX = 0xB4;//LDY Zero Page,x
 const Byte InsLDYABS = 0xAC; //LDY Absolute
 const Byte InsLDYABSX = 0XBC; //LDY Absolute,X
 
+//STORE OPCODES
+//STA
+const Byte InsSTAZP = 0x85;//STA Zero Page
+const Byte InsSTAZPX = 0x95;//STA Zero Page,X
+const Byte InsSTAABS = 0x8D;//STA Absolute
+const Byte InsSTAABSX = 0x9D;//STA Absolute,X
+const Byte InsSTAABSY = 0x99;//STA Absolute,Y
+const Byte InsSTAINDX = 0x81;//STA Indirect,X
+const Byte InsSTAINDY = 0x91;//STA Indirect,Y
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -53,6 +63,7 @@ Byte readByteInMemoryZeroPage(Memory *memory, u32 *cycles, Byte adrress) {
     (*cycles)--;
     return Data;
 }
+
 
 Byte readByteInMemory(Memory *memory, u32 *cycles, Word adrress) {
     Byte Data = memory->Data[adrress];
@@ -96,69 +107,118 @@ void updateFlagsLOAD(CPU *cpu) {
     }
 }
 
-Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+void writeByteInMemoryFromRegister(Byte regis, Memory *memory,u32 *cycles, Word adress) {
+    memory->Data[adress] = regis;
+    (*cycles)--;
+}
+
+Byte zeroPageValue(CPU *cpu, Memory *memory,u32 *cycles) {
     Byte adress = fetchInstrucstion(cpu,memory,cycles);
     Byte value = readByteInMemoryZeroPage(memory,cycles, adress);
     return value;
 }
 
+Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    return fetchInstrucstion(cpu,memory,cycles);
+}
+
 Byte zeroPageXAdress(CPU *cpu, Memory *memory,u32 *cycles) {
-    Byte adress = fetchInstrucstion(cpu,memory,cycles);
-    adress += cpu->X;
-    Byte temp = readByteInMemoryZeroPage(memory, cycles, adress);
-    return temp;
+    Byte zpAdrees = fetchInstrucstion(cpu,memory,cycles);
+    Byte finalAdress = cpu->X + zpAdrees;
+    (*cycles)--;
+    return finalAdress;
 }
 
-Byte zeroPageYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
-    Byte adress = fetchInstrucstion(cpu,memory,cycles);
-    adress += cpu->Y;
-    Byte temp = readByteInMemoryZeroPage(memory, cycles, adress);
-    return temp;
-}
-
-Byte absoluteAdress(CPU *cpu, Memory *memory,u32 *cycles) {
-    Word adress = fetchWord(cpu,memory,cycles);
-    Byte data = readByteInMemory(memory,cycles,adress);
-    return data;
-}
-
-Byte absoluteXAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+Word AbsoluteXAdress(CPU *cpu, Memory *memory,u32 *cycles) {
     Word adress = fetchWord(cpu,memory,cycles);
     Word adressX = adress + cpu->X;
-    Byte data = readByteInMemory(memory,cycles,adressX);
     if ((adress & 0xFF00) != (adressX & 0xFF00)) {
-        cycles--;
+        (*cycles)--;
     }
-    return data;
+    return adressX;
 }
 
-Byte absoluteYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+Word AbsoluteYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
     Word adress = fetchWord(cpu,memory,cycles);
     Word adressX = adress + cpu->Y;
-    Byte data = readByteInMemory(memory,cycles,adressX);
     if ((adress & 0xFF00) != (adressX & 0xFF00)) {
-        cycles--;
+        (*cycles)--;
     }
+    return adressX;
+}
+
+Word AbsoluteAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    return fetchWord(cpu,memory,cycles);
+}
+
+Byte zeroPageXValue(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte adress = zeroPageXAdress(cpu,memory,cycles);
+    Byte temp = readByteInMemoryZeroPage(memory, cycles, adress);
+    return temp;
+}
+
+Byte zeroPageYValue(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte adress = fetchInstrucstion(cpu,memory,cycles);
+    adress += cpu->Y;
+    (*cycles)--;
+    Byte temp = readByteInMemoryZeroPage(memory, cycles, adress);
+    return temp;
+}
+
+Byte absoluteValue(CPU *cpu, Memory *memory,u32 *cycles) {
+    Word adress = AbsoluteAdress(cpu,memory,cycles);
+    return readByteInMemory(memory,cycles,adress);
+}
+
+Byte absoluteXValue(CPU *cpu, Memory *memory,u32 *cycles) {
+    Word adressX = AbsoluteXAdress(cpu,memory,cycles);
+    Byte data = readByteInMemory(memory,cycles,adressX);
     return data;
 }
 
-Byte indirectX(CPU *cpu, Memory *memory,u32 *cycles) {
+Byte absoluteYValue(CPU *cpu, Memory *memory,u32 *cycles) {
+    Word adressY = AbsoluteYAdress(cpu,memory,cycles);
+    Byte data = readByteInMemory(memory,cycles,adressY);
+    return data;
+}
+
+Byte indirectXValue(CPU *cpu, Memory *memory,u32 *cycles) {
     Byte tempAdress = fetchInstrucstion(cpu,memory,cycles);
     Word zeroPageBaseAdress = tempAdress + cpu->X;
     Word efectiveAdress = readWord(memory,cycles,zeroPageBaseAdress);
     Byte value = readByteInMemory(memory,cycles,efectiveAdress);
+    (*cycles)--;
     return value;
 }
 
-Byte indirectY(CPU *cpu, Memory *memory,u32 *cycles) {
-    Byte ZeroPageAdress = fetchInstrucstion(cpu,memory,cycles);
-    Word adress = readWord(memory,cycles,ZeroPageAdress);
+Word indirectXAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte tempAdress = fetchInstrucstion(cpu,memory,cycles);
+    Word zeroPageBaseAdress = tempAdress + cpu->X;
+    (*cycles)--;
+    Word efectiveAdress = readWord(memory,cycles,zeroPageBaseAdress);
+    return efectiveAdress;
+}
+
+Byte indirectYValue(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte zeroPageValue = fetchInstrucstion(cpu,memory,cycles);
+    Word adress = readWord(memory,cycles,zeroPageValue);
     Word efectiveadress = adress + cpu->Y;
     Byte value = readByteInMemory(memory,cycles,efectiveadress);
     if ((adress & 0xFF00) != (efectiveadress& 0xFF00)) {
-    cycles--;
+    (*cycles)--;
     }
     return value;
+}
+
+Word indirectYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte zeroPageValue = fetchInstrucstion(cpu,memory,cycles);
+    Word adress = readWord(memory,cycles,zeroPageValue);
+    Word efectiveadress = adress + cpu->Y;
+    (*cycles)--;
+    if ((adress & 0xFF00) != (efectiveadress& 0xFF00)) {
+    (*cycles)--;
+    }
+    return efectiveadress;
 }
 
 void executeI(CPU *cpu, Memory *memory, u32 cycles) {
@@ -175,37 +235,37 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             break;
         }
         case InsLDAZP: {
-            cpu->ACC = zeroPageAdress(cpu,memory,&cycles);
+            cpu->ACC = zeroPageValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAZPX: {
-            cpu->ACC = zeroPageXAdress(cpu,memory,&cycles);
+            cpu->ACC = zeroPageXValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABS: {
-            cpu->ACC = absoluteAdress(cpu,memory,&cycles);
+            cpu->ACC = absoluteValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABSX: {
-            cpu->ACC = absoluteXAdress(cpu,memory,&cycles);
+            cpu->ACC = absoluteXValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAABSY: {
-            cpu->ACC = absoluteYAdress(cpu,memory,&cycles);
+            cpu->ACC = absoluteYValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAINDX: {
-            cpu->ACC = indirectX(cpu,memory,&cycles);
+            cpu->ACC = indirectXValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDAINDY: {
-            cpu->ACC = indirectY(cpu,memory,&cycles);
+            cpu->ACC = indirectYValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
@@ -225,22 +285,22 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             break;
         }
         case InsLDXZP: {
-            cpu->X = zeroPageAdress(cpu,memory,&cycles);
+            cpu->X = zeroPageValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDXZPY: {
-            cpu->X = zeroPageYAdress(cpu,memory,&cycles);
+            cpu->X = zeroPageYValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDXABS: {
-            cpu->X = absoluteAdress(cpu,memory,&cycles);
+            cpu->X =  absoluteValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDXABSY: {
-            cpu->X = absoluteYAdress(cpu,memory,&cycles);
+            cpu->X = absoluteYValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
@@ -252,30 +312,66 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             break;
         }
         case InsLDYZP: {
-            cpu->Y = zeroPageAdress(cpu,memory,&cycles);
+            cpu->Y = zeroPageValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDYZPX: {
-            cpu->Y = zeroPageXAdress(cpu,memory,&cycles);
+            cpu->Y =zeroPageXValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDYABS: {
-            cpu->Y = absoluteAdress(cpu,memory,&cycles);
+            cpu->Y =  absoluteValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
         case InsLDYABSX: {
-            cpu->Y = absoluteXAdress(cpu,memory,&cycles);
+            cpu->Y = absoluteXValue(cpu,memory,&cycles);
             updateFlagsLOAD(cpu);
             break;
         }
-        default:
+        //Store STA CASES 
+        case InsSTAZP: {
+            Byte addres = zeroPageAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
             break;
         }
-        if(cycles != 0)
-            cycles--;
+        case InsSTAZPX: {
+            Byte addres = zeroPageXAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            break;
+        }
+        case InsSTAABS: {
+            Word addres = AbsoluteAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            break;
+        }
+        case InsSTAABSX: {
+            Word addres = AbsoluteXAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            break;
+        }
+        case InsSTAABSY: {
+            Word addres = AbsoluteYAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            break;
+        }
+        case InsSTAINDX: {
+            Word addres = indirectXAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            break;
+        }
+        case InsSTAINDY: {
+            Word addres = indirectYAdress(cpu,memory,&cycles);
+            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            break;
+        }
+        default:
+            printf("\ninstruction not exist\n");
+            return;
+            break;
+        }
     }
 }
 
