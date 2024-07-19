@@ -469,7 +469,7 @@ void StoreYInstructionsTest(CPU cpu, Memory memory) {
     memory.Data[0xFFFC] = InsSTYZP; //opdocde
     memory.Data[0xFFFD] = 0x2;
     memory.Data[0x2] = 0;
-    printf("STX Zero Page TEST");
+    printf("STY Zero Page TEST");
     cpu.executeI(&cpu,&memory,3);
     assertEqual(memory.Data[0x2],10);
     printf("\n");
@@ -481,7 +481,7 @@ void StoreYInstructionsTest(CPU cpu, Memory memory) {
     memory.Data[0xFFFC] = InsSTYZPX; //opdocde
     memory.Data[0xFFFD] = 0x2;
     memory.Data[0x02 + 0x10] = 0;
-    printf("STX Zero Page,Y TEST");
+    printf("STY Zero Page,X TEST");
     cpu.executeI(&cpu,&memory,4);
     assertEqual(memory.Data[0x02 + 0x10],10);
     printf("\n");
@@ -493,7 +493,7 @@ void StoreYInstructionsTest(CPU cpu, Memory memory) {
     memory.Data[0xFFFD] = 0x42; //adress
     memory.Data[0xFFFE] = 0x42; //adress
     memory.Data[0x4242] = 0; //value
-    printf("STX Absolute TEST");
+    printf("STY Absolute TEST");
     cpu.executeI(&cpu, &memory, 4);
     assertEqual(memory.Data[0x4242],10);
     printf("\n");

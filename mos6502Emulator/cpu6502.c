@@ -64,7 +64,7 @@ void initMemory(Memory *memory) {
 void writeWord(Word data, u32 address, Memory *memory, u32 *cycles) {
         memory->Data[address] = data & 0xFF;
         memory->Data[address+1] = (data >> 8);
-        (*cycles)--;
+        (*cycles)-=2;
 }
 
 Byte readByteInMemoryZeroPage(Memory *memory, u32 *cycles, Byte adrress) {
@@ -153,6 +153,13 @@ Word AbsoluteXAdress(CPU *cpu, Memory *memory,u32 *cycles) {
     }
     return adressX;
 }
+//handling sta absolute x is the unique who ever consume 5 cycles
+Word AbsoluteXAdress5(CPU *cpu, Memory *memory,u32 *cycles) {
+    Word adress = fetchWord(cpu,memory,cycles);
+    Word adressX = adress + cpu->X;
+    (*cycles)--;
+    return adressX;
+}
 
 Word AbsoluteYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
     Word adress = fetchWord(cpu,memory,cycles);
@@ -160,6 +167,13 @@ Word AbsoluteYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
     if ((adress & 0xFF00) != (adressX & 0xFF00)) {
         (*cycles)--;
     }
+    return adressX;
+}
+//handling sta absolute y is the unique who ever consume 5 cycles
+Word AbsoluteYAdress5(CPU *cpu, Memory *memory,u32 *cycles) {
+    Word adress = fetchWord(cpu,memory,cycles);
+    Word adressX = adress + cpu->Y;
+    (*cycles)--;
     return adressX;
 }
 
@@ -230,10 +244,17 @@ Word indirectYAdress(CPU *cpu, Memory *memory,u32 *cycles) {
     Byte zeroPageValue = fetchInstrucstion(cpu,memory,cycles);
     Word adress = readWord(memory,cycles,zeroPageValue);
     Word efectiveadress = adress + cpu->Y;
-    (*cycles)--;
     if ((adress & 0xFF00) != (efectiveadress& 0xFF00)) {
     (*cycles)--;
     }
+    return efectiveadress;
+}
+//handling sta indirect,Y is the unique who ever consume 6 cycles
+Word indirectYAdress6(CPU *cpu, Memory *memory,u32 *cycles) {
+    Byte zeroPageValue = fetchInstrucstion(cpu,memory,cycles);
+    Word adress = readWord(memory,cycles,zeroPageValue);
+    Word efectiveadress = adress + cpu->Y;
+    (*cycles)--;
     return efectiveadress;
 }
 
@@ -289,7 +310,6 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             Word subAddr = fetchWord(cpu,memory,&cycles);
             writeWord(cpu->PC-1, cpu->SP,memory,&cycles);
             memory->Data[cpu->SP] = (unsigned char)(cpu->PC - 1);
-            cycles--;
             cpu->PC = subAddr;
             break;
         }
@@ -364,12 +384,12 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             break;
         }
         case InsSTAABSX: {
-            Word addres = AbsoluteXAdress(cpu,memory,&cycles);
+            Word addres = AbsoluteXAdress5(cpu,memory,&cycles);
             writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
             break;
         }
         case InsSTAABSY: {
-            Word addres = AbsoluteYAdress(cpu,memory,&cycles);
+            Word addres = AbsoluteYAdress5(cpu,memory,&cycles);
             writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
             break;
         }
@@ -379,7 +399,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             break;
         }
         case InsSTAINDY: {
-            Word addres = indirectYAdress(cpu,memory,&cycles);
+            Word addres = indirectYAdress6(cpu,memory,&cycles);
             writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
             break;
         }
