@@ -1,3 +1,4 @@
+#ifndef CPU6502_H
 #define CPU6502_H
 #include <stdint.h>
 
@@ -94,3 +95,5 @@ Word AbsoluteXAdress(CPU *cpu, Memory *memory,u32 *cycles);
 Byte zeroPageYAdress(CPU *cpu, Memory *memory,u32 *cycles);
 Byte zeroPageXAdress(CPU *cpu, Memory *memory,u32 *cycles);
 Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles);
+
+#endif // CPU6502_H
