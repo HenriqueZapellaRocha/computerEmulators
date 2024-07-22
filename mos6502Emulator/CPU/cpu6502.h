@@ -42,11 +42,32 @@ extern const Byte InsSTYABS;//STX Absolute
 extern const Byte InsRTSIMP;//RTS IMPLIED 
 extern const Byte InsJMPABS;//JMP ABSOLUTE
 extern const Byte InsJMPIND;//JMP INDIRECT
+extern const Byte InsTSX;//TSX STACK POINTER TO X 
+extern const Byte InsTXS;//TXS X to Stack pointer. Inverse of tsx
+extern const Byte InsPHA;//PHA
+extern const Byte InsPHP;//PHP
+extern const Byte InsPLA;//PLA
+extern const Byte InsPLP;//PLP
+
 
 typedef struct Memory {
     Byte Data[1024 * 64];
     void (*initMemory)(struct Memory *memory);
 } Memory;
+
+typedef union {
+    struct {
+    unsigned char C : 1; // Carry Flag
+    unsigned char Z : 1; // Zero Flag
+    unsigned char I : 1; // Interrupt Disable
+    unsigned char D : 1; // Decimal Mode
+    unsigned char B : 1; // Break Command
+    unsigned char O : 1; // Overflow Flag
+    unsigned char N : 1; // Negative Flag
+    } bits;
+    Byte byte;
+} ProcessorStatus;
+
 
 typedef struct CPU {
     
@@ -56,14 +77,7 @@ typedef struct CPU {
     
     Byte X,Y; //registers 8bit
     
-    //Status flags
-    Byte C : 1; //Carry Flag
-    Byte Z : 1; //Zero Flag
-    Byte I : 1; //Interrupt Disable
-    Byte D : 1; //Decimal Mode
-    Byte B : 1; //Break Command
-    Byte O : 1; //Overflow Flag
-    Byte N : 1; //Negative Flag
+    ProcessorStatus status; //flags
     
     void (*reset)(struct CPU *cpu, struct Memory *memory, Word pc);
     void (*executeI)(struct CPU *cpu, struct Memory *memory, u32 cycles);
@@ -78,7 +92,7 @@ void initMemory(Memory *memory);
 void writeWord(Word data, u32 address, Memory *memory, u32 *cycles);
 Word fetchWord(CPU *cpu, Memory *memory, u32 *cycles);
 Byte fetchInstrucstion(CPU *cpu, Memory *memory, u32 *cycles);
-void updateFlagsLOAD(CPU *cpu);
+void updateFlagsLOAD(Byte regis, CPU *cpu);
 void executeI(CPU *cpu, Memory *memory, u32 cycles);
 void startCPUMEMORY(CPU *cpu, Memory *memory);
 Byte readByteInMemoryZeroPage(Memory *memory, u32 *cycles, Byte adrress);
@@ -97,5 +111,7 @@ Word AbsoluteXAdress(CPU *cpu, Memory *memory,u32 *cycles);
 Byte zeroPageYAdress(CPU *cpu, Memory *memory,u32 *cycles);
 Byte zeroPageXAdress(CPU *cpu, Memory *memory,u32 *cycles);
 Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles);
-
+void pushByteToStack(CPU *cpu, Memory *memory, u32 *cycles,Byte value);
+void writeByteInMemoryFromRegister(Byte regis, Memory *memory,u32 *cycles, Word adress);
+Byte popByteStack(Memory *memory, u32 *cycles, CPU *cpu);
 #endif // CPU6502_H

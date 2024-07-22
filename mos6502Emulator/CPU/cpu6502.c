@@ -45,6 +45,13 @@ const Byte InsSTYABS = 0x8C;//STX Absolute
 //STACK OPERATIONS OPCODES
 const Byte InsJSRABS = 0x20;// JSR absolute
 const Byte InsRTSIMP = 0x60;//RTS IMPLIED 
+const Byte InsTSX = 0xBA;//TSX STACK POINTER TO X 
+const Byte InsTXS = 0x9A;//TXS X to Stack pointer. Inverse of tsx
+const Byte InsPHA = 0x48;//PHA
+const Byte InsPHP = 0x08;//PHP
+const Byte InsPLA = 0x68;//PLA
+const Byte InsPLP = 0x28;//PLP
+
 //JMP
 const Byte InsJMPABS = 0x4C;//JMP ABSOLUTE
 const Byte InsJMPIND = 0x6C;//JMP INDIRECT
@@ -60,7 +67,7 @@ void reset(CPU *cpu, Memory *memory,Word pc) {
     }
     cpu->SP = 0xFF;
     cpu->ACC = cpu->X = cpu->Y = 0;
-    cpu->C = cpu->Z = cpu->I = cpu->D = cpu->B = cpu->O = cpu->N = 0;
+    cpu->status.bits.C = cpu->status.bits.Z = cpu->status.bits.I = cpu->status.bits.D = cpu->status.bits.B = cpu->status.bits.O = cpu->status.bits.N = 0;
     memory->initMemory(memory);
 }
 
@@ -116,12 +123,12 @@ Byte fetchInstrucstion(CPU *cpu, Memory *memory, u32 *cycles) {
     return Data;
 }
 
-void updateFlagsLOAD(CPU *cpu) {
-    if(cpu->ACC==0) {
-        cpu->Z = 0x1;
+void updateFlagsLOAD(Byte regist, CPU *cpu) {
+    if(regist==0) {
+        cpu->status.bits.Z = 0x1;
     }
-    if((cpu->ACC & 0b10000000) > 0) {
-        cpu->N = 0x1;
+    if((regist & 0b10000000) > 0) {
+        cpu->status.bits.N = 0x1;
     }
 }
 
@@ -266,6 +273,7 @@ Word indirectYAdress6(CPU *cpu, Memory *memory,u32 *cycles) {
     (*cycles)--;
     return efectiveadress;
 }
+
 //program counter to stack
 void PcToStack(CPU *cpu, Memory *memory, u32 *cycles) {
     Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
@@ -273,8 +281,26 @@ void PcToStack(CPU *cpu, Memory *memory, u32 *cycles) {
     cpu->SP -= 2;
 }
 
+//accumulator to stack
+void pushByteToStack(CPU *cpu, Memory *memory, u32 *cycles,Byte value) {
+    Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
+    writeByteInMemoryFromRegister(value,memory,cycles,stackAddress);
+    cpu->SP -=1;
+    (*cycles)--;
+}
+
 //pop things from stack
-Word popStack(Memory *memory, u32 *cycles, CPU *cpu) {
+Byte popByteStack(Memory *memory, u32 *cycles, CPU *cpu) {
+    Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
+    Byte value = readByteInMemory(memory,cycles,stackAddress+1);
+    cpu->SP++;
+    (*cycles)--;
+    return value;
+}
+
+
+//pop things from stack
+Word popWordStack(Memory *memory, u32 *cycles, CPU *cpu) {
     Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
     Word returnAddr = readWord(memory,cycles,stackAddress+1);
     cpu->SP += 2;
@@ -292,96 +318,96 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         case InsLDAIM: {
             temp = fetchInstrucstion(cpu, memory,&cycles);
             cpu->ACC = temp;
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->ACC, cpu);
             break;
         }
         case InsLDAZP: {
             cpu->ACC = zeroPageValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->ACC, cpu);
             break;
         }
         case InsLDAZPX: {
             cpu->ACC = zeroPageXValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->ACC, cpu);
             break;
         }
         case InsLDAABS: {
             cpu->ACC = absoluteValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->ACC, cpu);
             break;
         }
         case InsLDAABSX: {
             cpu->ACC = absoluteXValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->ACC, cpu);
             break;
         }
         case InsLDAABSY: {
             cpu->ACC = absoluteYValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->ACC, cpu);
             break;
         }
         case InsLDAINDX: {
             cpu->ACC = indirectXValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->ACC, cpu);
             break;
         }
         case InsLDAINDY: {
             cpu->ACC = indirectYValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->ACC, cpu);
             break;
         }
         //LOAD LDX CASES
         case InsLDXIM: {
             temp = fetchInstrucstion(cpu, memory,&cycles);
             cpu->X = temp;
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->X, cpu);
             break;
         }
         case InsLDXZP: {
             cpu->X = zeroPageValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->X, cpu);
             break;
         }
         case InsLDXZPY: {
             cpu->X = zeroPageYValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->X, cpu);
             break;
         }
         case InsLDXABS: {
             cpu->X =  absoluteValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->X, cpu);
             break;
         }
         case InsLDXABSY: {
             cpu->X = absoluteYValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->X, cpu);
             break;
         }
         //LOAD LDY CASES
         case InsLDYIM: {
             temp = fetchInstrucstion(cpu, memory,&cycles);
             cpu->Y = temp;
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->Y, cpu);
             break;
         }
         case InsLDYZP: {
             cpu->Y = zeroPageValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->Y, cpu);
             break;
         }
         case InsLDYZPX: {
             cpu->Y =zeroPageXValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->Y, cpu);
             break;
         }
         case InsLDYABS: {
             cpu->Y =  absoluteValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->Y, cpu);
             break;
         }
         case InsLDYABSX: {
             cpu->Y = absoluteXValue(cpu,memory,&cycles);
-            updateFlagsLOAD(cpu);
+            updateFlagsLOAD(cpu->Y, cpu);
             break;
         }
         //Store STA CASES 
@@ -452,6 +478,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             writeByteInMemoryFromRegister(cpu->Y, memory,&cycles,addres);
             break;
         }
+        //STACK operations
         //JSR INSTRUCTION 
         case InsJSRABS: {
             Word subAddr = fetchWord(cpu,memory,&cycles);
@@ -462,9 +489,45 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         }
         //RTS INSTRUCTION 
         case InsRTSIMP: {
-            Word adress = popStack(memory,&cycles,cpu);
+            Word adress = popWordStack(memory,&cycles,cpu);
             cpu->PC = adress+1;
             cycles -=2;
+            break;
+        }
+        //TSX INSTRUCTION 
+        case InsTSX: {
+            cpu->X = cpu->SP;
+            updateFlagsLOAD(cpu->X, cpu); //reusing de load update flages beacause it affects the same flags 
+            cycles--;
+            break;
+        }
+        //TXS INSTRUCTION 
+        case InsTXS: {
+            cpu->SP = cpu->X;
+            cycles--;
+            break;
+        }
+        //PHA INSTRUCTION 
+        case InsPHA: {
+            pushByteToStack(cpu,memory,&cycles,cpu->ACC);
+            break;
+        }
+        //PHP INSTRUCTION 
+        case InsPHP: {
+            pushByteToStack(cpu,memory,&cycles,cpu->status.byte);
+            break;
+        }
+        //PLA INSTRUCTION 
+        case InsPLA: {
+            cpu->ACC = popByteStack(memory,&cycles,cpu);
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            cycles--;
+            break;
+        }
+        //PLP INSTRUCTION 
+        case InsPLP: {
+            cpu->status.byte = popByteStack(memory,&cycles,cpu);
+            cycles--;
             break;
         }
         //JMP Absolute
@@ -475,7 +538,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         //JMP Indirect
         case InsJMPIND: {
             cpu->PC = AbsoluteAdress(cpu,memory,&cycles);
-            cpu->PC = AbsoluteAdress(cpu,memory,&cycles);
+            cpu->PC = readWord(memory,&cycles,cpu->PC);
             break;
         }
         default:
