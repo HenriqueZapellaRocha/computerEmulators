@@ -1,9 +1,9 @@
 
 #include <stdio.h>
 #include "TestFuncions.h"
-#include "testLoad.h"
-#include "testStore.h"
-#include "testStack.h"
+#include "tests/testLoad.h"
+#include "tests/testStore.h"
+#include "tests/testStack.h"
 
 
 int main(void) {

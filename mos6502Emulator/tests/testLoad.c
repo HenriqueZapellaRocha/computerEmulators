@@ -129,7 +129,7 @@ void LoadAInstructionsTest(CPU *cpu, Memory *memory) {
     cpu->executeI(cpu, memory, 6);
     printf("LDA Inderect,Y (Page Boundry) TEST");
     assertEqual(cpu->ACC,10);
-    printf("\n");;
+    printf("\n");
     cpu->reset(cpu,memory,0);
 }
 

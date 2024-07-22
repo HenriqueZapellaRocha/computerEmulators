@@ -1,7 +1,7 @@
 #include "testStore.h"
 #include <stdio.h>
 #include "TestFuncions.h"
-#include "cpu6502.h"
+#include "../cpu6502.h"
 
 void StoreAInstructionsTest(CPU *cpu, Memory *memory) {
     //STA Zero page
