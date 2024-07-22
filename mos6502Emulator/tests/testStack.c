@@ -1,5 +1,5 @@
 #include "testStack.h"
-#include "../cpu6502.h"
+#include "../CPU/cpu6502.h"
 #include <stdio.h>
 #include "TestFuncions.h"
 
@@ -15,4 +15,5 @@ void stackOperationsTest(CPU *cpu, Memory *memory) {
     printf("JSR AND RTS TEST");
     cpu->executeI(cpu, memory, 14);
     assertEqual(cpu->ACC, 10);
+    printf("\n");
 }

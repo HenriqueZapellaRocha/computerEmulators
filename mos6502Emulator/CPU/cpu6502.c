@@ -45,6 +45,9 @@ const Byte InsSTYABS = 0x8C;//STX Absolute
 //STACK OPERATIONS OPCODES
 const Byte InsJSRABS = 0x20;// JSR absolute
 const Byte InsRTSIMP = 0x60;//RTS IMPLIED 
+//JMP
+const Byte InsJMPABS = 0x4C;//JMP ABSOLUTE
+const Byte InsJMPIND = 0x6C;//JMP INDIRECT
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -263,13 +266,14 @@ Word indirectYAdress6(CPU *cpu, Memory *memory,u32 *cycles) {
     (*cycles)--;
     return efectiveadress;
 }
-
+//program counter to stack
 void PcToStack(CPU *cpu, Memory *memory, u32 *cycles) {
     Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
     writeWord(cpu->PC-1, stackAddress-1,memory,cycles);
     cpu->SP -= 2;
 }
 
+//pop things from stack
 Word popStack(Memory *memory, u32 *cycles, CPU *cpu) {
     Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
     Word returnAddr = readWord(memory,cycles,stackAddress+1);
@@ -461,6 +465,17 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             Word adress = popStack(memory,&cycles,cpu);
             cpu->PC = adress+1;
             cycles -=2;
+            break;
+        }
+        //JMP Absolute
+        case InsJMPABS: {
+            cpu->PC = AbsoluteAdress(cpu,memory,&cycles);
+            break;
+        }
+        //JMP Indirect
+        case InsJMPIND: {
+            cpu->PC = AbsoluteAdress(cpu,memory,&cycles);
+            cpu->PC = AbsoluteAdress(cpu,memory,&cycles);
             break;
         }
         default:

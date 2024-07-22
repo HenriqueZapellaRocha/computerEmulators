@@ -12,11 +12,12 @@ include_directories(${PROJECT_SOURCE_DIR})
 # adding the archives
 set(SOURCES
     6502main.c
-    cpu6502.c
-    TestFuncions.c
+    CPU/cpu6502.c
+    tests/TestFuncions.c
     tests/testLoad.c
     tests/testStack.c
     tests/testStore.c
+    tests/testJmp.c
 )
 
 

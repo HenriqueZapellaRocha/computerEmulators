@@ -1,10 +1,11 @@
 
 #include <stdio.h>
-#include "TestFuncions.h"
+#include "tests/TestFuncions.h"
 #include "tests/testLoad.h"
 #include "tests/testStore.h"
 #include "tests/testStack.h"
-
+#include "tests/testJmp.h"
+#include "CPU/cpu6502.h"
 
 int main(void) {
     CPU cpu;
@@ -12,7 +13,7 @@ int main(void) {
     
     startCPUMEMORY(&cpu, &memory);
 
-    int testSelection = 1;
+    int testSelection = 7;
 
     switch (testSelection)
     {
@@ -42,6 +43,7 @@ int main(void) {
     }
     case 7: {
         stackOperationsTest(&cpu,&memory);
+        jmpTest(&cpu,&memory);
         break;
     }
     default:

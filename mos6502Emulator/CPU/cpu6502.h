@@ -39,7 +39,9 @@ extern const Byte InsSTXABS;//STX Absolute
 extern const Byte InsSTYZP;//STY Zero Page
 extern const Byte InsSTYZPX;//STY Zero Page,X
 extern const Byte InsSTYABS;//STX Absolute
-const Byte InsRTSIMP;//RTS IMPLIED 
+extern const Byte InsRTSIMP;//RTS IMPLIED 
+extern const Byte InsJMPABS;//JMP ABSOLUTE
+extern const Byte InsJMPIND;//JMP INDIRECT
 
 typedef struct Memory {
     Byte Data[1024 * 64];
