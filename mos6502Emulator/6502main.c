@@ -5,6 +5,7 @@
 #include "tests/testStore.h"
 #include "tests/testStack.h"
 #include "tests/testJmp.h"
+#include "tests/testLogic.h"
 #include "CPU/cpu6502.h"
 
 int main(void) {
@@ -13,7 +14,7 @@ int main(void) {
     
     startCPUMEMORY(&cpu, &memory);
 
-    int testSelection = 7;
+    int testSelection = 8;
 
     switch (testSelection)
     {
@@ -44,6 +45,18 @@ int main(void) {
     case 7: {
         stackOperationsTest(&cpu,&memory);
         jmpTest(&cpu,&memory);
+        break;
+    }
+    case 8: {
+        LoadAInstructionsTest(&cpu,&memory);
+        LoadXInstructionsTest(&cpu,&memory);
+        LoadYInstructionsTest(&cpu,&memory);
+        StoreAInstructionsTest(&cpu,&memory);
+        StoreXInstructionsTest(&cpu,&memory);
+        StoreYInstructionsTest(&cpu,&memory);
+        stackOperationsTest(&cpu,&memory);
+        jmpTest(&cpu,&memory);
+        ANDTests(&cpu,&memory);
         break;
     }
     default:

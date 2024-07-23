@@ -48,7 +48,15 @@ extern const Byte InsPHA;//PHA
 extern const Byte InsPHP;//PHP
 extern const Byte InsPLA;//PLA
 extern const Byte InsPLP;//PLP
-
+extern const Byte InsANDIM;//AND immediate
+extern const Byte InsANDIM;//AND immediate
+extern const Byte InsANDZP;//AND Zero Page
+extern const Byte InsANDZPX;//AND Zero Page,X
+extern const Byte InsANDABS;//AND Absolute
+extern const Byte InsANDABSX;//AND Absolute,X
+extern const Byte InsANDABSY;//AND Absolute,Y
+extern const Byte InsANDINDX;//AND (Indirect,X)
+extern const Byte InsANDINDY;//AND (Indirect),Y
 
 typedef struct Memory {
     Byte Data[1024 * 64];

@@ -55,6 +55,17 @@ const Byte InsPLP = 0x28;//PLP
 //JMP
 const Byte InsJMPABS = 0x4C;//JMP ABSOLUTE
 const Byte InsJMPIND = 0x6C;//JMP INDIRECT
+//Logic 
+//AND 
+const Byte InsANDIM = 0x29;//AND immediate
+const Byte InsANDZP = 0x25;//AND Zero Page
+const Byte InsANDZPX = 0x35;//AND Zero Page,X
+const Byte InsANDABS = 0x2D;//AND Absolute
+const Byte InsANDABSX = 0x3D;//AND Absolute,X
+const Byte InsANDABSY = 0x39;//AND Absolute,Y
+const Byte InsANDINDX = 0x21;//AND (Indirect,X)
+const Byte InsANDINDY = 0x31;//AND (Indirect),Y
+
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -539,6 +550,47 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         case InsJMPIND: {
             cpu->PC = AbsoluteAdress(cpu,memory,&cycles);
             cpu->PC = readWord(memory,&cycles,cpu->PC);
+            break;
+        }
+        //AND CASES
+        case InsANDIM: {
+            cpu->ACC = fetchInstrucstion(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsANDZP: {
+            cpu->ACC = zeroPageValue(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsANDZPX: {
+            cpu->ACC = zeroPageXValue(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsANDABS: {
+            cpu->ACC = absoluteValue(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsANDABSX: {
+            cpu->ACC = absoluteXValue(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsANDABSY: {
+            cpu->ACC = absoluteYValue(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsANDINDX: {
+            cpu->ACC = indirectXValue(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsANDINDY: {
+            cpu->ACC = indirectYValue(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }
         default:
