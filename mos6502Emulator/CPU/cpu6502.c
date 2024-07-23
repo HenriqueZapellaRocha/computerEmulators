@@ -65,7 +65,24 @@ const Byte InsANDABSX = 0x3D;//AND Absolute,X
 const Byte InsANDABSY = 0x39;//AND Absolute,Y
 const Byte InsANDINDX = 0x21;//AND (Indirect,X)
 const Byte InsANDINDY = 0x31;//AND (Indirect),Y
-
+//EOR
+const Byte InsEORIM = 0x49;//EOR immediate
+const Byte InsEORZP = 0x45;//EOR Zero Page
+const Byte InsEORZPX = 0x55;//EOR Zero Page,X
+const Byte InsEORABS = 0x4D;//EOR Absolute
+const Byte InsEORABSX = 0x5D;//EOR Absolute,X
+const Byte InsEORABSY = 0x59;//EOR Absolute,Y
+const Byte InsEORINDX = 0x41;//EOR (Indirect,X)
+const Byte InsEORINDY = 0x51;//EOR (Indirect),Y
+//ORA
+const Byte InsORAIM = 0x09;//ORA immediate
+const Byte InsORAZP = 0x05;//ORA Zero Page
+const Byte InsORAZPX = 0x15;//ORA Zero Page,X
+const Byte InsORAABS = 0x0D;//ORA Absolute
+const Byte InsORAABSX = 0x1D;//ORA Absolute,X
+const Byte InsORAABSY = 0x19;//ORA Absolute,Y
+const Byte InsORAINDX = 0x01;//ORA (Indirect,X)
+const Byte InsORAINDY = 0x11;//ORA (Indirect),Y
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -590,6 +607,88 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         }
         case InsANDINDY: {
             cpu->ACC = indirectYValue(cpu,memory,&cycles) & cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        //EOR CASES
+        case InsEORIM: {
+            cpu->ACC = fetchInstrucstion(cpu,memory,&cycles) ^ cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsEORZP: {
+            cpu->ACC = zeroPageValue(cpu,memory,&cycles) ^ cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsEORZPX: {
+            cpu->ACC = zeroPageXValue(cpu,memory,&cycles) ^ cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsEORABS: {
+            cpu->ACC = absoluteValue(cpu,memory,&cycles) ^ cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsEORABSX: {
+            cpu->ACC = absoluteXValue(cpu,memory,&cycles) ^ cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsEORABSY: {
+            cpu->ACC = absoluteYValue(cpu,memory,&cycles) ^ cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsEORINDX: {
+            cpu->ACC = indirectXValue(cpu,memory,&cycles) ^ cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsEORINDY: {
+            cpu->ACC = indirectYValue(cpu,memory,&cycles) ^ cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        //ORA CASES
+        case InsORAIM: {
+            cpu->ACC = fetchInstrucstion(cpu,memory,&cycles) | cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsORAZP: {
+            cpu->ACC = zeroPageValue(cpu,memory,&cycles) | cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsORAZPX: {
+            cpu->ACC = zeroPageXValue(cpu,memory,&cycles) | cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsORAABS: {
+            cpu->ACC = absoluteValue(cpu,memory,&cycles) | cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsORAABSX: {
+            cpu->ACC = absoluteXValue(cpu,memory,&cycles) | cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsORAABSY: {
+            cpu->ACC = absoluteYValue(cpu,memory,&cycles) | cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsORAINDX: {
+            cpu->ACC = indirectXValue(cpu,memory,&cycles) | cpu->ACC;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsORAINDY: {
+            cpu->ACC = indirectYValue(cpu,memory,&cycles) | cpu->ACC;
             updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }

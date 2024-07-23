@@ -56,7 +56,7 @@ int main(void) {
         StoreYInstructionsTest(&cpu,&memory);
         stackOperationsTest(&cpu,&memory);
         jmpTest(&cpu,&memory);
-        ANDTests(&cpu,&memory);
+        logicTests(&cpu,&memory);
         break;
     }
     default:

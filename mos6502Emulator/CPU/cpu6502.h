@@ -57,6 +57,22 @@ extern const Byte InsANDABSX;//AND Absolute,X
 extern const Byte InsANDABSY;//AND Absolute,Y
 extern const Byte InsANDINDX;//AND (Indirect,X)
 extern const Byte InsANDINDY;//AND (Indirect),Y
+extern const Byte InsEORIM;//EOR immediate
+extern const Byte InsEORZP;//EOR Zero Page
+extern const Byte InsEORZPX;//EOR Zero Page,X
+extern const Byte InsEORABS;//EOR Absolute
+extern const Byte InsEORABSX;//EOR Absolute,X
+extern const Byte InsEORABSY;//EOR Absolute,Y
+extern const Byte InsEORINDX;//EOR (Indirect,X)
+extern const Byte InsEORINDY;//EOR (Indirect),Y
+extern const Byte InsORAIM;//ORA immediate
+extern const Byte InsORAZP;//ORA Zero Page
+extern const Byte InsORAZPX;//ORA Zero Page,X
+extern const Byte InsORAABS;//ORA Absolute
+extern const Byte InsORAABSX;//ORA Absolute,X
+extern const Byte InsORAABSY;//ORA Absolute,Y
+extern const Byte InsORAINDX;//ORA (Indirect,X)
+extern const Byte InsORAINDY;//ORA (Indirect),Y
 
 typedef struct Memory {
     Byte Data[1024 * 64];
