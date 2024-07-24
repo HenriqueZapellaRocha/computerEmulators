@@ -45,7 +45,7 @@ void stackOperationsTest(CPU *cpu, Memory *memory) {
     //PHP
     cpu->reset(cpu,memory,0xFF00);
     cpu->status.bits.Z = 1;
-    cpu->status.bits.O = 1;
+    cpu->status.bits.V = 1;
     memory->Data[0xFF00] = InsPHP;
     printf("PHP TEST");
     cpu->executeI(cpu, memory, 3);
@@ -65,11 +65,11 @@ void stackOperationsTest(CPU *cpu, Memory *memory) {
     //PLP
     cpu->reset(cpu,memory,0xFF00);
     cpu->status.bits.Z = 1;
-    cpu->status.bits.O = 1;
+    cpu->status.bits.V = 1;
     Byte testStatus = cpu->status.byte;
     memory->Data[0x1FF] = cpu->status.byte;
     cpu->status.bits.Z = 0;
-    cpu->status.bits.O = 0;
+    cpu->status.bits.V = 0;
     cpu->SP -=1;
     memory->Data[0xFF00] = InsPLP;
     printf("PLP TEST");

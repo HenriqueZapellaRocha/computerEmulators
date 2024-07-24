@@ -83,6 +83,10 @@ const Byte InsORAABSX = 0x1D;//ORA Absolute,X
 const Byte InsORAABSY = 0x19;//ORA Absolute,Y
 const Byte InsORAINDX = 0x01;//ORA (Indirect,X)
 const Byte InsORAINDY = 0x11;//ORA (Indirect),Y
+const Byte InsBITZP = 0x24;//BIT Zero Page
+const Byte InsBITABS = 0x2C;//BIT Absolute
+
+
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -95,7 +99,7 @@ void reset(CPU *cpu, Memory *memory,Word pc) {
     }
     cpu->SP = 0xFF;
     cpu->ACC = cpu->X = cpu->Y = 0;
-    cpu->status.bits.C = cpu->status.bits.Z = cpu->status.bits.I = cpu->status.bits.D = cpu->status.bits.B = cpu->status.bits.O = cpu->status.bits.N = 0;
+    cpu->status.bits.C = cpu->status.bits.Z = cpu->status.bits.I = cpu->status.bits.D = cpu->status.bits.B = cpu->status.bits.V = cpu->status.bits.N = 0;
     memory->initMemory(memory);
 }
 
@@ -157,6 +161,18 @@ void updateFlagsLOAD(Byte regist, CPU *cpu) {
     }
     if((regist & 0b10000000) > 0) {
         cpu->status.bits.N = 0x1;
+    }
+}
+
+void updateFlagsBIT(Byte value1,Byte value2, CPU *cpu) {
+    if((value1 & value2) == 0) {
+        cpu->status.bits.Z = 0x1;
+    }
+    if((value2 & 0b10000000) > 0) {
+        cpu->status.bits.N = 0x1;
+    }
+    if((value2 & 0b01000000) > 0) {
+        cpu->status.bits.V = 0x1;
     }
 }
 
@@ -692,11 +708,33 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }
+        case InsBITZP: {
+            updateFlagsBIT(cpu->ACC, zeroPageValue(cpu,memory,&cycles),cpu);
+            break;
+        }
+        case InsBITABS: {
+            updateFlagsBIT(cpu->ACC, absoluteValue(cpu,memory,&cycles),cpu);
+            break;
+        }
         default:
             printf("\ninstruction not exist\n");
             return;
             break;
         }
+    }
+}
+
+void loadProgram(CPU *cpu, Memory *memory,Byte *program,size_t programSize) {
+    //collect the start of the program 
+    Byte low = program[0];
+    Word high = program[1] << 8;
+    Word initialAdress = high | low;
+    cpu->PC = initialAdress;
+    //putting the rest of the progam in memeory
+    Word memoryC = initialAdress;
+    for(Word i =2; i < programSize;i++) {
+        memory->Data[memoryC] = program[i];
+        memoryC++;
     }
 }
 

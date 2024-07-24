@@ -1,6 +1,7 @@
 #ifndef CPU6502_H
 #define CPU6502_H
 #include <stdint.h>
+#include <stdio.h>
 
 #define Byte unsigned char //8bits
 #define Word unsigned short //16bits
@@ -73,6 +74,8 @@ extern const Byte InsORAABSX;//ORA Absolute,X
 extern const Byte InsORAABSY;//ORA Absolute,Y
 extern const Byte InsORAINDX;//ORA (Indirect,X)
 extern const Byte InsORAINDY;//ORA (Indirect),Y
+extern const Byte InsBITZP;//BIT Zero Page
+extern const Byte InsBITABS;//BIT Absolute
 
 typedef struct Memory {
     Byte Data[1024 * 64];
@@ -86,7 +89,7 @@ typedef union {
     unsigned char I : 1; // Interrupt Disable
     unsigned char D : 1; // Decimal Mode
     unsigned char B : 1; // Break Command
-    unsigned char O : 1; // Overflow Flag
+    unsigned char V : 1; // Overflow Flag
     unsigned char N : 1; // Negative Flag
     } bits;
     Byte byte;
@@ -138,4 +141,5 @@ Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles);
 void pushByteToStack(CPU *cpu, Memory *memory, u32 *cycles,Byte value);
 void writeByteInMemoryFromRegister(Byte regis, Memory *memory,u32 *cycles, Word adress);
 Byte popByteStack(Memory *memory, u32 *cycles, CPU *cpu);
+void loadProgram(CPU *cpu, Memory *memory,Byte *program,size_t programSize);
 #endif // CPU6502_H

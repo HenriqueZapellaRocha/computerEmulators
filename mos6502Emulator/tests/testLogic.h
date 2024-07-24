@@ -9,3 +9,4 @@ enum ops {
 
 
 void logicTests(CPU *cpu, Memory *memory);
+void bitTests(CPU *cpu, Memory *memory);

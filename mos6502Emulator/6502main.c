@@ -63,6 +63,10 @@ int main(void) {
         return 0;
     }
 
+    Byte program[] = {0x00,0x10,0xA9,0xFF,0x85,0x90,0x8D,0x00,0x80,0x49,0xCC,0x4C,0x02,0x10};
+    size_t programSize = sizeof(program) / sizeof(program[0]);
+    loadProgram(&cpu,&memory,program,programSize);
+    cpu.executeI(&cpu,&memory,41);
     return 0; 
 }
 

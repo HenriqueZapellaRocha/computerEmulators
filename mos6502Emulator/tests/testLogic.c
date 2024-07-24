@@ -19,6 +19,7 @@ void logicTests(CPU *cpu, Memory *memory) {
     tests(cpu,memory,AND);
     tests(cpu,memory,EOR);
     tests(cpu,memory,ORA);
+    bitTests(cpu,memory);
 }
 
 
@@ -249,5 +250,40 @@ void tests(CPU *cpu, Memory *memory, enum ops operation) {
     memory->Data[0x8101] = 10; //value cpu->y + 800
     cpu->executeI(cpu, memory, 6);
     assertEqual(cpu->ACC,makeLogicOp(operation,10,10));
+    printf("\n");
+}
+
+void bitTests(CPU *cpu, Memory *memory) {
+    //BIT Zero Page
+    cpu->reset(cpu,memory,0);
+    printf("BIT Zero Page TEST ");
+    cpu->ACC = 0b00001111;
+    memory->Data[0xFFFC] = InsBITZP;
+    memory->Data[0xFFFD] = 0x02;
+    memory->Data[0x02] = 0b11110000;
+    cpu->executeI(cpu,memory,3);
+    printf(" Z flag:");
+    assertEqual(cpu->status.bits.Z, 1);
+    printf(" N flag:");
+    assertEqual(cpu->status.bits.Z, 1);
+    printf(" V flag:");
+    assertEqual(cpu->status.bits.V, 1);
+    printf("\n");
+    
+    //BIT Absolute
+    cpu->reset(cpu,memory,0);
+    printf("BIT Absolute TEST ");
+    cpu->ACC = 0b00001111;
+    memory->Data[0xFFFC] = InsBITABS;
+    memory->Data[0xFFFD] = 0x00;
+    memory->Data[0xFFFE] = 0x80;
+    memory->Data[0x8000] = 0b11110000;
+    cpu->executeI(cpu,memory,4);
+    printf(" Z flag:");
+    assertEqual(cpu->status.bits.Z, 1);
+    printf(" N flag:");
+    assertEqual(cpu->status.bits.Z, 1);
+    printf(" V flag:");
+    assertEqual(cpu->status.bits.V, 1);
     printf("\n");
 }
