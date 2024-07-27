@@ -82,6 +82,13 @@ extern const Byte InsTSX;//TSX
 extern const Byte InsTXA;//TXA
 extern const Byte InsTXS;//TXS
 extern const Byte InsTYA;//TYA
+extern const Byte InsINCZP;//INC, Zero Page
+extern const Byte InsINCZPX;//INC, Zero Page,X 
+extern const Byte InsINCABS;//INC, Absolute
+extern const Byte InsINCABSX;//INC, Absolute,X
+extern const Byte InsINX;//INX
+extern const Byte InsINY;//INY
+
 
 typedef struct Memory {
     Byte Data[1024 * 64];

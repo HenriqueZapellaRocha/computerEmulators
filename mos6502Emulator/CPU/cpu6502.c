@@ -91,7 +91,13 @@ const Byte InsTAX = 0xAA;//TAX
 const Byte InsTAY = 0xA8;//TAY
 const Byte InsTXA = 0x8A;//TXA
 const Byte InsTYA = 0x98;//TYA
-
+//Increment Decrement
+const Byte InsINCZP = 0xE6;//INC, Zero Page
+const Byte InsINCZPX = 0xF6;//INC, Zero Page,X 
+const Byte InsINCABS = 0xEE;//INC, Absolute
+const Byte InsINCABSX = 0xFE;//INC, Absolute,X
+const Byte InsINX = 0xE8;//INX
+const Byte InsINY = 0xC8;//INY
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -744,6 +750,51 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             cpu->ACC = cpu->Y;
             cycles--;
             updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        //Increment Decrement Cases
+        case InsINCZP: {
+            Byte adress = zeroPageAdress(cpu,memory,&cycles);
+            Byte value = readByteInMemoryZeroPage(memory,&cycles,adress);
+            value++;
+            writeWord(value,adress,memory,&cycles);
+            updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsINCZPX: {
+            Byte adress = zeroPageXAdress(cpu,memory,&cycles);
+            Byte value = readByteInMemoryZeroPage(memory,&cycles,adress);
+            value++;
+            writeWord(value,adress,memory,&cycles);
+            updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsINCABS: {
+            Word adress = AbsoluteAdress(cpu,memory,&cycles);
+            Byte value = readByteInMemory(memory,&cycles,adress);
+            value++;
+            writeWord(value,adress,memory,&cycles);
+            updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsINCABSX: {
+            Word adress = AbsoluteXAdress5(cpu,memory,&cycles);
+            Byte value = readByteInMemory(memory,&cycles,adress);
+            value++;
+            writeWord(value,adress,memory,&cycles);
+            updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsINX: {
+            cpu->X +=1;
+            cycles--;
+            updateFlagsLOAD(cpu->X, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsINY: {
+            cpu->Y +=1;
+            cycles--;
+            updateFlagsLOAD(cpu->Y, cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }
         default:

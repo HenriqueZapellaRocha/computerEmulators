@@ -20,6 +20,7 @@ set(SOURCES
     tests/testJmp.c
     tests/testLogic.c
     tests/testTranfers.c
+    tests/testIncDc.c
 )
 
 
