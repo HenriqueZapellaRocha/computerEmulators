@@ -76,6 +76,12 @@ extern const Byte InsORAINDX;//ORA (Indirect,X)
 extern const Byte InsORAINDY;//ORA (Indirect),Y
 extern const Byte InsBITZP;//BIT Zero Page
 extern const Byte InsBITABS;//BIT Absolute
+extern const Byte InsTAX;//TAX
+extern const Byte InsTAY;//TAY
+extern const Byte InsTSX;//TSX
+extern const Byte InsTXA;//TXA
+extern const Byte InsTXS;//TXS
+extern const Byte InsTYA;//TYA
 
 typedef struct Memory {
     Byte Data[1024 * 64];

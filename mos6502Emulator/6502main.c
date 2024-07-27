@@ -6,6 +6,7 @@
 #include "tests/testStack.h"
 #include "tests/testJmp.h"
 #include "tests/testLogic.h"
+#include "tests/testTranfers.h"
 #include "CPU/cpu6502.h"
 
 int main(void) {
@@ -57,6 +58,7 @@ int main(void) {
         stackOperationsTest(&cpu,&memory);
         jmpTest(&cpu,&memory);
         logicTests(&cpu,&memory);
+        testTranfersRegisters(&cpu,&memory);
         break;
     }
     default:

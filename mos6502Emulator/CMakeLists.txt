@@ -19,6 +19,7 @@ set(SOURCES
     tests/testStore.c
     tests/testJmp.c
     tests/testLogic.c
+    tests/testTranfers.c
 )
 
 

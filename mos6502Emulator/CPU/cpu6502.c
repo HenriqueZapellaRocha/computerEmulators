@@ -86,6 +86,11 @@ const Byte InsORAINDY = 0x11;//ORA (Indirect),Y
 const Byte InsBITZP = 0x24;//BIT Zero Page
 const Byte InsBITABS = 0x2C;//BIT Absolute
 
+//Register Transfers
+const Byte InsTAX = 0xAA;//TAX
+const Byte InsTAY = 0xA8;//TAY
+const Byte InsTXA = 0x8A;//TXA
+const Byte InsTYA = 0x98;//TYA
 
 
 const u32 maxMemorySize = 1024 * 64;
@@ -714,6 +719,31 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         }
         case InsBITABS: {
             updateFlagsBIT(cpu->ACC, absoluteValue(cpu,memory,&cycles),cpu);
+            break;
+        }
+        //Transfer register CASES
+        case InsTAX: {
+            cpu->X = cpu->ACC;
+            cycles--;
+            updateFlagsLOAD(cpu->X, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsTAY: {
+            cpu->Y = cpu->ACC;
+            cycles--;
+            updateFlagsLOAD(cpu->Y, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsTXA: {
+            cpu->ACC = cpu->X;
+            cycles--;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsTYA: {
+            cpu->ACC = cpu->Y;
+            cycles--;
+            updateFlagsLOAD(cpu->ACC, cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }
         default:
