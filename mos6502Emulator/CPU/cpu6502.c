@@ -1,5 +1,6 @@
 #include "cpu6502.h"
 #include <stdio.h>
+#include <stdint.h>
 
 //LOAD OPCODES
 //LDA
@@ -104,6 +105,8 @@ const Byte InsDECABS = 0xCE;//DEC, Absolute
 const Byte InsDECABSX = 0xDE;//DEC, Absolute,X
 const Byte InsDEX = 0xCA;//DEX
 const Byte InsDEY = 0x88;//DEY
+//Branches 
+const Byte InsBEQ = 0xF0;//BEQ
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -845,6 +848,19 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
             cpu->Y -=1;
             cycles--;
             updateFlagsLOAD(cpu->Y, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        //BRANCH CASES
+        case InsBEQ: {
+            Byte value = fetchInstrucstion(cpu,memory,&cycles);
+            if(cpu->status.bits.Z == 0) {
+                Word oldPc = cpu->PC;
+                cpu->PC += (int8_t)value;
+                cycles--;
+                if((oldPc & 0xFF00) != (cpu->PC & 0xFF00)) {
+                    cycles-=2;
+                }
+            }
             break;
         }
         default:

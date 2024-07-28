@@ -21,6 +21,7 @@ set(SOURCES
     tests/testLogic.c
     tests/testTranfers.c
     tests/testIncDc.c
+    tests/testBrach.c
 )
 
 

@@ -94,7 +94,7 @@ extern const Byte InsDECABS;//DEC, Absolute
 extern const Byte InsDECABSX;//DEC, Absolute,X
 extern const Byte InsDEX;//DEX
 extern const Byte InsDEY ;//DEY
-
+extern const Byte InsBEQ;//BEQ
 typedef struct Memory {
     Byte Data[1024 * 64];
     void (*initMemory)(struct Memory *memory);
