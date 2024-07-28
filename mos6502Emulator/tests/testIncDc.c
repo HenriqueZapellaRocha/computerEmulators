@@ -65,3 +65,67 @@ void incrementTest(CPU *cpu, Memory *memory) {
     assertEqual(cpu->Y, 1);
     printf("\n");
 }
+
+void dencrementTest(CPU *cpu, Memory *memory) {
+    //DEC zero page
+    cpu->reset(cpu,memory,0);
+    memory->Data[0xFFFC] = InsDECZP;
+    memory->Data[0xFFFD] = 0x02;
+    memory->Data[0x02] = 2;
+    printf("DEC zero page TEST");
+    cpu->executeI(cpu, memory, 5);
+    assertEqual(memory->Data[0x02], 1);
+    printf("\n");
+
+    //DEC zero page,X
+    cpu->reset(cpu,memory,0);
+    cpu->X = 1;
+    memory->Data[0xFFFC] = InsDECZPX;
+    memory->Data[0xFFFD] = 0x02;
+    memory->Data[0x03] = 2;
+    printf("DEC zero page,X TEST");
+    cpu->executeI(cpu, memory, 6);
+    assertEqual(memory->Data[0x03], 1);
+    printf("\n");
+
+    //DEC Absolute
+    cpu->reset(cpu,memory,0);
+    memory->Data[0xFFFC] = InsDECABS;
+    memory->Data[0xFFFD] = 0x02;
+    memory->Data[0XFFFE] = 0x80;
+    memory->Data[0X8002] = 2;
+    printf("DEC Absolute TEST");
+    cpu->executeI(cpu, memory, 6);
+    assertEqual(memory->Data[0X8002], 1);
+    printf("\n");
+
+    //DEC Absolute,X
+    cpu->reset(cpu,memory,0);
+    cpu->X = 1;
+    memory->Data[0xFFFC] = InsDECABSX;
+    memory->Data[0xFFFD] = 0x02;
+    memory->Data[0XFFFE] = 0x80;
+    memory->Data[0X8002+1] = 2;
+    printf("DEC Absolute,X TEST");
+    cpu->executeI(cpu, memory, 7);
+    assertEqual(memory->Data[0X8002+1], 1);
+    printf("\n");
+
+    //DEX 
+    cpu->reset(cpu,memory,0);
+    cpu->X = 2;
+    memory->Data[0xFFFC] = InsDEX;
+    printf("DEX TEST");
+    cpu->executeI(cpu, memory, 2);
+    assertEqual(cpu->X, 1);
+    printf("\n");
+
+    //DEY
+    cpu->reset(cpu,memory,0);
+    cpu->Y = 2;
+    memory->Data[0xFFFC] = InsDEY;
+    printf("DEY TEST");
+    cpu->executeI(cpu, memory, 2);
+    assertEqual(cpu->Y, 1);
+    printf("\n");
+}

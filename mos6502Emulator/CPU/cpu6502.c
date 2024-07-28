@@ -98,6 +98,12 @@ const Byte InsINCABS = 0xEE;//INC, Absolute
 const Byte InsINCABSX = 0xFE;//INC, Absolute,X
 const Byte InsINX = 0xE8;//INX
 const Byte InsINY = 0xC8;//INY
+const Byte InsDECZP = 0xc6;//DEC, Zero Page
+const Byte InsDECZPX = 0xd6;//DEC, Zero Page,X 
+const Byte InsDECABS = 0xCE;//DEC, Absolute
+const Byte InsDECABSX = 0xDE;//DEC, Absolute,X
+const Byte InsDEX = 0xCA;//DEX
+const Byte InsDEY = 0x88;//DEY
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -187,7 +193,7 @@ void updateFlagsBIT(Byte value1,Byte value2, CPU *cpu) {
     }
 }
 
-void writeByteInMemoryFromRegister(Byte regis, Memory *memory,u32 *cycles, Word adress) {
+void writeByte(Byte regis, Memory *memory,u32 *cycles, Word adress) {
     memory->Data[adress] = regis;
     (*cycles)--;
 }
@@ -339,7 +345,7 @@ void PcToStack(CPU *cpu, Memory *memory, u32 *cycles) {
 //accumulator to stack
 void pushByteToStack(CPU *cpu, Memory *memory, u32 *cycles,Byte value) {
     Word stackAddress = 0x0100 | cpu->SP; //SP in word for the 1st page
-    writeByteInMemoryFromRegister(value,memory,cycles,stackAddress);
+    writeByte(value,memory,cycles,stackAddress);
     cpu->SP -=1;
     (*cycles)--;
 }
@@ -468,69 +474,69 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         //Store STA CASES 
         case InsSTAZP: {
             Byte addres = zeroPageAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            writeByte(cpu->ACC, memory,&cycles,addres);
             break;
         }
         case InsSTAZPX: {
             Byte addres = zeroPageXAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            writeByte(cpu->ACC, memory,&cycles,addres);
             break;
         }
         case InsSTAABS: {
             Word addres = AbsoluteAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            writeByte(cpu->ACC, memory,&cycles,addres);
             break;
         }
         case InsSTAABSX: {
             Word addres = AbsoluteXAdress5(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            writeByte(cpu->ACC, memory,&cycles,addres);
             break;
         }
         case InsSTAABSY: {
             Word addres = AbsoluteYAdress5(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            writeByte(cpu->ACC, memory,&cycles,addres);
             break;
         }
         case InsSTAINDX: {
             Word addres = indirectXAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            writeByte(cpu->ACC, memory,&cycles,addres);
             break;
         }
         case InsSTAINDY: {
             Word addres = indirectYAdress6(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->ACC, memory,&cycles,addres);
+            writeByte(cpu->ACC, memory,&cycles,addres);
             break;
         }
         //Store STX CASES 
         case InsSTXZP: {
             Byte addres = zeroPageAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->X, memory,&cycles,addres);
+            writeByte(cpu->X, memory,&cycles,addres);
             break;
         }
         case InsSTXZPY: {
             Byte addres = zeroPageYAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->X, memory,&cycles,addres);
+            writeByte(cpu->X, memory,&cycles,addres);
             break;
         }
         case InsSTXABS: {
             Word addres = AbsoluteAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->X, memory,&cycles,addres);
+            writeByte(cpu->X, memory,&cycles,addres);
             break;
         }
         //Store STY CASES 
         case InsSTYZP: {
             Byte addres = zeroPageAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->Y, memory,&cycles,addres);
+            writeByte(cpu->Y, memory,&cycles,addres);
             break;
         }
         case InsSTYZPX: {
             Byte addres = zeroPageXAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->Y, memory,&cycles,addres);
+            writeByte(cpu->Y, memory,&cycles,addres);
             break;
         }
         case InsSTYABS: {
             Word addres = AbsoluteAdress(cpu,memory,&cycles);
-            writeByteInMemoryFromRegister(cpu->Y, memory,&cycles,addres);
+            writeByte(cpu->Y, memory,&cycles,addres);
             break;
         }
         //STACK operations
@@ -755,33 +761,33 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         //Increment Decrement Cases
         case InsINCZP: {
             Byte adress = zeroPageAdress(cpu,memory,&cycles);
-            Byte value = readByteInMemoryZeroPage(memory,&cycles,adress);
-            value++;
-            writeWord(value,adress,memory,&cycles);
+            Byte value = readByteInMemoryZeroPage(memory,&cycles,adress)+1;
+            cycles--; //from the adding 1 
+            writeByte(value,memory,&cycles,adress);
             updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }
         case InsINCZPX: {
             Byte adress = zeroPageXAdress(cpu,memory,&cycles);
-            Byte value = readByteInMemoryZeroPage(memory,&cycles,adress);
-            value++;
-            writeWord(value,adress,memory,&cycles);
+            Byte value = readByteInMemoryZeroPage(memory,&cycles,adress)+1;
+            cycles--; //from the adding 1 
+            writeByte(value,memory,&cycles,adress);
             updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }
         case InsINCABS: {
             Word adress = AbsoluteAdress(cpu,memory,&cycles);
-            Byte value = readByteInMemory(memory,&cycles,adress);
-            value++;
-            writeWord(value,adress,memory,&cycles);
+            Byte value = readByteInMemory(memory,&cycles,adress)+1;
+            cycles--; //from the adding 1 
+            writeByte(value,memory,&cycles,adress);
             updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }
         case InsINCABSX: {
             Word adress = AbsoluteXAdress5(cpu,memory,&cycles);
-            Byte value = readByteInMemory(memory,&cycles,adress);
-            value++;
-            writeWord(value,adress,memory,&cycles);
+            Byte value = readByteInMemory(memory,&cycles,adress)+1;
+            cycles--; //from the adding 1 
+            writeByte(value,memory,&cycles,adress);
             updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
             break;
         }
@@ -793,6 +799,50 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         }
         case InsINY: {
             cpu->Y +=1;
+            cycles--;
+            updateFlagsLOAD(cpu->Y, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsDECZP: {
+            Byte adress = zeroPageAdress(cpu,memory,&cycles);
+            Byte value = readByteInMemoryZeroPage(memory,&cycles,adress)-1;
+            cycles--; //from the adding 1 
+            writeByte(value,memory,&cycles,adress);
+            updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsDECZPX: {
+            Byte adress = zeroPageXAdress(cpu,memory,&cycles);
+            Byte value = readByteInMemoryZeroPage(memory,&cycles,adress)-1;
+            cycles--; //from the adding 1 
+            writeByte(value,memory,&cycles,adress);
+            updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsDECABS: {
+            Word adress = AbsoluteAdress(cpu,memory,&cycles);
+            Byte value = readByteInMemory(memory,&cycles,adress)-1;
+            cycles--; //from the adding 1 
+            writeByte(value,memory,&cycles,adress);
+            updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsDECABSX: {
+            Word adress = AbsoluteXAdress5(cpu,memory,&cycles);
+            Byte value = readByteInMemory(memory,&cycles,adress)-1;
+            cycles--; //from the adding 1 
+            writeByte(value,memory,&cycles,adress);
+            updateFlagsLOAD(memory->Data[adress], cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsDEX: {
+            cpu->X -=1;
+            cycles--;
+            updateFlagsLOAD(cpu->X, cpu); //reusing de load update flages beacause it affects the same flags 
+            break;
+        }
+        case InsDEY: {
+            cpu->Y -=1;
             cycles--;
             updateFlagsLOAD(cpu->Y, cpu); //reusing de load update flages beacause it affects the same flags 
             break;

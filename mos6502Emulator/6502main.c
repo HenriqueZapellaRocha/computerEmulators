@@ -61,6 +61,7 @@ int main(void) {
         logicTests(&cpu,&memory);
         testTranfersRegisters(&cpu,&memory);
         incrementTest(&cpu,&memory);
+        dencrementTest(&cpu,&memory);
         break;
     }
     default:

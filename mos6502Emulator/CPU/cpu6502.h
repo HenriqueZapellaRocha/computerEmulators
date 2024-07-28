@@ -88,7 +88,12 @@ extern const Byte InsINCABS;//INC, Absolute
 extern const Byte InsINCABSX;//INC, Absolute,X
 extern const Byte InsINX;//INX
 extern const Byte InsINY;//INY
-
+extern const Byte InsDECZP;//DEC, Zero Page
+extern const Byte InsDECZPX;//DEC, Zero Page,X 
+extern const Byte InsDECABS;//DEC, Absolute
+extern const Byte InsDECABSX;//DEC, Absolute,X
+extern const Byte InsDEX;//DEX
+extern const Byte InsDEY ;//DEY
 
 typedef struct Memory {
     Byte Data[1024 * 64];
@@ -152,7 +157,7 @@ Byte zeroPageYAdress(CPU *cpu, Memory *memory,u32 *cycles);
 Byte zeroPageXAdress(CPU *cpu, Memory *memory,u32 *cycles);
 Byte zeroPageAdress(CPU *cpu, Memory *memory,u32 *cycles);
 void pushByteToStack(CPU *cpu, Memory *memory, u32 *cycles,Byte value);
-void writeByteInMemoryFromRegister(Byte regis, Memory *memory,u32 *cycles, Word adress);
+void writeByte(Byte regis, Memory *memory,u32 *cycles, Word adress);
 Byte popByteStack(Memory *memory, u32 *cycles, CPU *cpu);
 void loadProgram(CPU *cpu, Memory *memory,Byte *program,size_t programSize);
 #endif // CPU6502_H
