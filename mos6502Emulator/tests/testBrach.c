@@ -34,6 +34,7 @@ void branchTests(CPU *cpu, Memory *memory) {
     assertEqual(cpu->PC, 0xFEFF + 0x1);
     printf("\n");
 
+    //testing just the 3 cycles type beacause the others tested before in beq
     //BCC 
     cpu->reset(cpu,memory,0XFFFA);
     cpu->status.bits.C = 0;

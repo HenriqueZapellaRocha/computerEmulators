@@ -114,6 +114,15 @@ const Byte InsBNE = 0xD0;//BNE
 const Byte InsBVC = 0x50;//BVC
 const Byte InsBPL = 0x10;//BPL
 const Byte InsBVS = 0x70;//BVS
+//Status Flag
+const Byte InsCLC = 0x18;//CLC 
+const Byte InsCLD = 0xD8;//CLD
+const Byte InsCLC = 0x18;//CLC 
+const Byte InsCLI = 0x58;//CLI
+const Byte InsCLV = 0xB8;//CLV
+const Byte InsSEC = 0x38;//SEC
+const Byte InsSED = 0xF8;//SED
+const Byte InsSEI = 0x78;//SEI
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -896,6 +905,42 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         }
         case InsBPL: {
             branch(cpu->status.bits.N,0,cpu,memory,&cycles);
+            break;
+        }
+        //AND CASES
+        case InsCLC: {
+            cpu->status.bits.C =0;
+            cycles--;
+            break;
+        }
+        case InsCLD: {
+            cpu->status.bits.D =0;
+            cycles--;
+            break;
+        }
+        case InsCLI: {
+            cpu->status.bits.I =0;
+            cycles--;
+            break;
+        }
+        case InsCLV: {
+            cpu->status.bits.V =0;
+            cycles--;
+            break;
+        }
+        case InsSEC: {
+            cpu->status.bits.C =1;
+            cycles--;
+            break;
+        }
+        case InsSED: {
+            cpu->status.bits.D =1;
+            cycles--;
+            break;
+        }
+        case InsSEI: {
+            cpu->status.bits.I =1;
+            cycles--;
             break;
         }
         default:

@@ -102,6 +102,14 @@ extern const Byte InsBNE;//BNE
 extern const Byte InsBVC;//BVC
 extern const Byte InsBPL;//BPL
 extern const Byte InsBVS;//BVS
+extern const Byte InsCLC;//CLC 
+extern const Byte InsCLD;//CLD
+extern const Byte InsCLC;//CLC 
+extern const Byte InsCLI;//CLI
+extern const Byte InsCLV;//CLV
+extern const Byte InsSEC;//SEC
+extern const Byte InsSED;//SED
+extern const Byte InsSEI;//SEI
 
 
 typedef struct Memory {
