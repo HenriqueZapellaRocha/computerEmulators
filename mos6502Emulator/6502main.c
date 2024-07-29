@@ -8,6 +8,7 @@
 #include "tests/testLogic.h"
 #include "tests/testTranfers.h"
 #include "tests/testIncDc.h"
+#include "tests/testBrach.h"
 #include "CPU/cpu6502.h"
 
 int main(void) {
@@ -62,16 +63,19 @@ int main(void) {
         testTranfersRegisters(&cpu,&memory);
         incrementTest(&cpu,&memory);
         dencrementTest(&cpu,&memory);
+        branchTests(&cpu,&memory);
         break;
     }
     default:
         return 0;
     }
+    
     cpu.reset(&cpu,&memory,0);
-    Byte program[] = {0x00,0x11,0xE8,0xF0,0xFD};
+    Byte program[] = {0x00,0x11,0xA9,0x00,0xF0,0xFC};
     size_t programSize = sizeof(program) / sizeof(program[0]);
     loadProgram(&cpu,&memory,program,programSize);
     cpu.executeI(&cpu,&memory,41);
+    
     return 0; 
 }
 

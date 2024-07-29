@@ -853,7 +853,7 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         //BRANCH CASES
         case InsBEQ: {
             Byte value = fetchInstrucstion(cpu,memory,&cycles);
-            if(cpu->status.bits.Z == 0) {
+            if(cpu->status.bits.Z == 1) {
                 Word oldPc = cpu->PC;
                 cpu->PC += (int8_t)value;
                 cycles--;
