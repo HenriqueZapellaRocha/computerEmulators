@@ -107,6 +107,13 @@ const Byte InsDEX = 0xCA;//DEX
 const Byte InsDEY = 0x88;//DEY
 //Branches 
 const Byte InsBEQ = 0xF0;//BEQ
+const Byte InsBCC = 0x90;//BCC
+const Byte InsBCS = 0xB0;//BCS
+const Byte InsBMI = 0x30;//BMI
+const Byte InsBNE = 0xD0;//BNE
+const Byte InsBVC = 0x50;//BVC
+const Byte InsBPL = 0x10;//BPL
+const Byte InsBVS = 0x70;//BVS
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -370,6 +377,18 @@ Word popWordStack(Memory *memory, u32 *cycles, CPU *cpu) {
     cpu->SP += 2;
     (*cycles)--;
     return returnAddr;
+}
+
+void branch(Byte flagStatus,Byte equal, CPU *cpu, Memory *memory, u32 *cycles) {
+    Byte value = fetchInstrucstion(cpu,memory,cycles);
+    if(flagStatus == equal) {
+        Word oldPc = cpu->PC;
+        cpu->PC += (int8_t)value;
+        (*cycles)--;
+        if((oldPc & 0xFF00) != (cpu->PC & 0xFF00)) {
+            (*cycles)-=2;
+        }
+    }
 }
 
 void executeI(CPU *cpu, Memory *memory, u32 cycles) {
@@ -852,15 +871,31 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         }
         //BRANCH CASES
         case InsBEQ: {
-            Byte value = fetchInstrucstion(cpu,memory,&cycles);
-            if(cpu->status.bits.Z == 1) {
-                Word oldPc = cpu->PC;
-                cpu->PC += (int8_t)value;
-                cycles--;
-                if((oldPc & 0xFF00) != (cpu->PC & 0xFF00)) {
-                    cycles-=2;
-                }
-            }
+            branch(cpu->status.bits.Z,1,cpu,memory,&cycles);
+            break;
+        }
+        case InsBCC: {
+            branch(cpu->status.bits.C,0,cpu,memory,&cycles);
+            break;
+        }
+        case InsBCS: {
+            branch(cpu->status.bits.C,1,cpu,memory,&cycles);
+            break;
+        }
+        case InsBMI: {
+            branch(cpu->status.bits.N,1,cpu,memory,&cycles);
+            break;
+        }
+        case InsBNE: {
+            branch(cpu->status.bits.N,0,cpu,memory,&cycles);
+            break;
+        }
+        case InsBVC: {
+            branch(cpu->status.bits.V,0,cpu,memory,&cycles);
+            break;
+        }
+        case InsBPL: {
+            branch(cpu->status.bits.N,0,cpu,memory,&cycles);
             break;
         }
         default:

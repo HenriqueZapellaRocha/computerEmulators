@@ -95,6 +95,15 @@ extern const Byte InsDECABSX;//DEC, Absolute,X
 extern const Byte InsDEX;//DEX
 extern const Byte InsDEY ;//DEY
 extern const Byte InsBEQ;//BEQ
+extern const Byte InsBCC ;//BCC
+extern const Byte InsBCS;//BCS
+extern const Byte InsBMI;//BMI
+extern const Byte InsBNE;//BNE
+extern const Byte InsBVC;//BVC
+extern const Byte InsBPL;//BPL
+extern const Byte InsBVS;//BVS
+
+
 typedef struct Memory {
     Byte Data[1024 * 64];
     void (*initMemory)(struct Memory *memory);
@@ -160,4 +169,5 @@ void pushByteToStack(CPU *cpu, Memory *memory, u32 *cycles,Byte value);
 void writeByte(Byte regis, Memory *memory,u32 *cycles, Word adress);
 Byte popByteStack(Memory *memory, u32 *cycles, CPU *cpu);
 void loadProgram(CPU *cpu, Memory *memory,Byte *program,size_t programSize);
+void branch(Byte flagStatus,Byte equal, CPU *cpu, Memory *memory, u32 *cycles);
 #endif // CPU6502_H

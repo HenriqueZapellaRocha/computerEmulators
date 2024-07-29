@@ -70,12 +70,13 @@ int main(void) {
         return 0;
     }
     
+    /*
     cpu.reset(&cpu,&memory,0);
     Byte program[] = {0x00,0x11,0xA9,0x00,0xF0,0xFC};
     size_t programSize = sizeof(program) / sizeof(program[0]);
     loadProgram(&cpu,&memory,program,programSize);
     cpu.executeI(&cpu,&memory,41);
-    
+    */
     return 0; 
 }
 
