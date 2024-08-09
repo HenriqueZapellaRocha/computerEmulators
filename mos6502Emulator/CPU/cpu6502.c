@@ -117,12 +117,16 @@ const Byte InsBVS = 0x70;//BVS
 //Status Flag
 const Byte InsCLC = 0x18;//CLC 
 const Byte InsCLD = 0xD8;//CLD
-const Byte InsCLC = 0x18;//CLC 
 const Byte InsCLI = 0x58;//CLI
 const Byte InsCLV = 0xB8;//CLV
 const Byte InsSEC = 0x38;//SEC
 const Byte InsSED = 0xF8;//SED
 const Byte InsSEI = 0x78;//SEI
+//ARITIMECT
+const Byte InsADCIM = 0x69;//ADC immediate
+
+//NOP
+const Byte InsNOP = 0xEA;
 
 const u32 maxMemorySize = 1024 * 64;
 
@@ -378,6 +382,17 @@ Byte popByteStack(Memory *memory, u32 *cycles, CPU *cpu) {
     return value;
 }
 
+//case both positive = 1, case both negative = 2 case diferent signals = 3
+int verifyNumberSingals(int8_t value1, int8_t value2) {
+    if(value1 > 0 && value2 > 0) {
+        return 1;
+    } else if (value1 < 0 && value2 < 0) {
+        return 2;
+    } else {
+        return 3;
+    }
+}
+
 
 //pop things from stack
 Word popWordStack(Memory *memory, u32 *cycles, CPU *cpu) {
@@ -398,6 +413,10 @@ void branch(Byte flagStatus,Byte equal, CPU *cpu, Memory *memory, u32 *cycles) {
             (*cycles)-=2;
         }
     }
+}
+
+void updateAdcFlags(CPU *cpu, int8_t value, int8_t oldCpuACC) {
+
 }
 
 void executeI(CPU *cpu, Memory *memory, u32 cycles) {
@@ -941,6 +960,17 @@ void executeI(CPU *cpu, Memory *memory, u32 cycles) {
         case InsSEI: {
             cpu->status.bits.I =1;
             cycles--;
+            break;
+        }
+        case InsNOP: {
+            cpu->PC++;
+            cycles--;
+            break;
+        }
+        //ARITIMECT CASES
+        case InsADCIM: {
+            int8_t value = (int8_t)fetchInstrucstion(cpu,memory,&cycles);
+            cpu->ACC += value;
             break;
         }
         default:

@@ -22,6 +22,7 @@ set(SOURCES
     tests/testTranfers.c
     tests/testIncDc.c
     tests/testBrach.c
+    tests/testAritimetic.c
 )
 
 

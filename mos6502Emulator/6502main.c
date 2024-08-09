@@ -9,6 +9,7 @@
 #include "tests/testTranfers.h"
 #include "tests/testIncDc.h"
 #include "tests/testBrach.h"
+#include "tests/testAritimetic.h"
 #include "CPU/cpu6502.h"
 
 int main(void) {
@@ -64,6 +65,7 @@ int main(void) {
         incrementTest(&cpu,&memory);
         dencrementTest(&cpu,&memory);
         branchTests(&cpu,&memory);
+        aritimeticTests(&cpu,&memory);
         break;
     }
     default:

@@ -110,7 +110,8 @@ extern const Byte InsCLV;//CLV
 extern const Byte InsSEC;//SEC
 extern const Byte InsSED;//SED
 extern const Byte InsSEI;//SEI
-
+extern const Byte InsNOP;//NOP
+extern const Byte InsADCIM;//ADC immediate
 
 typedef struct Memory {
     Byte Data[1024 * 64];
